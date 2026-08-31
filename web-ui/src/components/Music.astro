@@ -93,6 +93,8 @@ const track = '/audio/Christina Perri - A Thousand Years.mp3';
     audio.dataset.ready = '1';
 
     const TARGET = 0.55;
+    const START_AT = 14;   // skip the intro — come in on the verse
+    const FADE_MS = 3200;
     const STORE = 'wedding:music-muted';
     let started = false;
     let fade = 0;
@@ -100,17 +102,41 @@ const track = '/audio/Christina Perri - A Thousand Years.mp3';
     const wantsSound = () => localStorage.getItem(STORE) !== '1';
 
     /* Ease the volume up rather than dropping the visitor straight into
-       a chorus the moment the envelope opens. */
+       the middle of a phrase. Eased rather than linear, so the swell is
+       gentle at the start and settles smoothly at the top. */
     const fadeIn = () => {
       cancelAnimationFrame(fade);
       const from = performance.now();
       const step = (now: number) => {
-        const t = Math.min(1, (now - from) / 2600);
-        audio.volume = TARGET * t;
+        const t = Math.min(1, (now - from) / FADE_MS);
+        audio.volume = TARGET * (1 - Math.pow(1 - t, 3));
         if (t < 1) fade = requestAnimationFrame(step);
       };
       fade = requestAnimationFrame(step);
     };
+
+    /* Seeking needs metadata; with preload="none" it may not be there yet,
+       so wait for it rather than silently starting from zero. Every loop
+       returns to the same in-point. */
+    const seekToStart = () =>
+      new Promise<void>((resolve) => {
+        const apply = () => {
+          try {
+            if (audio.duration > START_AT) audio.currentTime = START_AT;
+          } catch {
+            /* seeking unsupported — play from the top */
+          }
+          resolve();
+        };
+        if (audio.readyState >= 1) apply();
+        else audio.addEventListener('loadedmetadata', apply, { once: true });
+      });
+
+    audio.addEventListener('seeked', () => {
+      // A loop restart lands at 0; bring it back to the in-point.
+      if (!audio.paused && audio.currentTime < 1) audio.currentTime = START_AT;
+    });
+    audio.addEventListener('ended', () => { audio.currentTime = START_AT; });
 
     const reflect = (on: boolean) => {
       toggle.setAttribute('aria-pressed', String(on));
@@ -130,7 +156,13 @@ const track = '/audio/Christina Perri - A Thousand Years.mp3';
       }
 
       audio.volume = 0;
-      audio.play().then(
+      audio.load();
+      // play() must be called on the gesture, not after an await, or the
+      // activation window is gone; the seek is applied as soon as metadata
+      // lands, which is well inside the fade.
+      const playing = audio.play();
+      seekToStart();
+      playing.then(
         () => {
           reflect(true);
           fadeIn();
@@ -160,6 +192,7 @@ const track = '/audio/Christina Perri - A Thousand Years.mp3';
       if (audio.paused) {
         localStorage.removeItem(STORE);
         audio.volume = 0;
+        if (audio.currentTime < 1) seekToStart();
         audio.play().then(() => {
           reflect(true);
           fadeIn();
