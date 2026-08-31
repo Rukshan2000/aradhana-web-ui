@@ -1,0 +1,234 @@
+/* ── Design tokens ───────────────────────────────────────────── */
+:root {
+  --ivory: #fbf8f3;
+  --ivory-deep: #f3ece1;
+  --ink: #221d17;
+  --ink-soft: #5d5347;
+  --gold: #b08d4f;
+  --gold-light: #d8bd8a;
+  --blush: #e8d5cd;
+  --sage: #8a9a83;
+
+  --font-display: "Cormorant Garamond", "Times New Roman", serif;
+  --font-body: "Jost", ui-sans-serif, system-ui, sans-serif;
+
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --gutter: clamp(1.25rem, 5vw, 6rem);
+  --rule: 1px solid rgba(176, 141, 79, 0.28);
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html {
+  /* Lenis drives the scrolling; native smooth would fight it */
+  scroll-behavior: auto;
+}
+
+body {
+  margin: 0;
+  background: var(--ivory);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-weight: 300;
+  font-size: clamp(0.95rem, 0.9rem + 0.2vw, 1.05rem);
+  line-height: 1.75;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+/* Lenis requirements */
+html.lenis, html.lenis body { height: auto; }
+.lenis.lenis-smooth { scroll-behavior: auto !important; }
+.lenis.lenis-stopped { overflow: hidden; }
+
+h1, h2, h3, h4 {
+  font-family: var(--font-display);
+  font-weight: 300;
+  letter-spacing: 0.01em;
+  line-height: 1.08;
+  margin: 0;
+}
+
+p { margin: 0 0 1.1em; }
+img { display: block; max-width: 100%; }
+a { color: inherit; }
+
+.section {
+  position: relative;
+  padding: clamp(5rem, 12vh, 10rem) var(--gutter);
+}
+
+.wrap { max-width: 1180px; margin-inline: auto; }
+.narrow { max-width: 720px; margin-inline: auto; }
+
+.eyebrow {
+  font-size: 0.7rem;
+  letter-spacing: 0.42em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 1.5rem;
+}
+
+.script {
+  font-family: var(--font-display);
+  font-style: italic;
+  color: var(--gold);
+}
+
+/* ── Ornamental divider ──────────────────────────────────────── */
+.ornament {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  color: var(--gold-light);
+}
+.ornament::before, .ornament::after {
+  content: "";
+  height: 1px;
+  width: min(120px, 18vw);
+  background: linear-gradient(90deg, transparent, var(--gold-light));
+}
+.ornament::after { background: linear-gradient(270deg, transparent, var(--gold-light)); }
+
+/* ── Scroll-reveal primitives ─────────────────────────────────
+   Only the resting ("hidden") state lives in CSS. Every transition
+   from here on is driven by anime.js in src/scripts/motion.js, so
+   reveals, curtains and scrubbed timelines share one easing model. */
+[data-reveal] {
+  opacity: 0;
+  transform: translate3d(0, 34px, 0);
+  will-change: transform, opacity;
+}
+/* Direction the element travels FROM, so a downward scroll is answered by
+   motion across the page rather than more of the same vertical drift. */
+[data-reveal="left"]  { transform: translate3d(-70px, 0, 0); }
+[data-reveal="right"] { transform: translate3d(70px, 0, 0); }
+[data-reveal="down"]  { transform: translate3d(0, -34px, 0); }
+
+/* Image curtain: the frame clips, the photo counter-scales */
+[data-curtain] { overflow: hidden; }
+[data-curtain] img {
+  clip-path: inset(0 0 100% 0);
+  transform: scale(1.18);
+  will-change: clip-path, transform;
+}
+[data-curtain][data-wipe="left"]  img { clip-path: inset(0 100% 0 0); }
+[data-curtain][data-wipe="right"] img { clip-path: inset(0 0 0 100%); }
+[data-curtain] { will-change: transform; }
+
+/* Per-character headline reveal, split by JS */
+.char {
+  display: inline-block;
+  opacity: 0;
+  will-change: transform, opacity;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-reveal], [data-curtain] img { opacity: 1 !important; transform: none !important; clip-path: none !important; }
+  .char { opacity: 1 !important; }
+}
+
+/* ── Decorative layer ─────────────────────────────────────────
+   Everything below is pure ornament: no markup depends on it, and
+   nothing here participates in layout. All of it sits under the
+   envelope gate (z-index 200) and ignores the pointer.           */
+
+/* Paper grain over the whole page, so flat ivory reads as stock */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  pointer-events: none;
+  opacity: 0.05;
+  mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* Hairline gold frame, like the border of a printed invitation */
+body::after {
+  content: "";
+  position: fixed;
+  inset: clamp(10px, 1.6vw, 22px);
+  z-index: 50;
+  pointer-events: none;
+  border: 1px solid rgba(176, 141, 79, 0.22);
+}
+@media (max-width: 700px) {
+  body::after { display: none; }
+}
+
+/* A small lozenge marks the seam between every pair of sections */
+.section + .section::before {
+  content: "";
+  position: absolute;
+  top: clamp(1.6rem, 4vh, 3rem);
+  left: 50%;
+  width: 7px;
+  height: 7px;
+  margin-left: -3.5px;
+  border: 1px solid var(--gold);
+  transform: rotate(45deg);
+  opacity: 0.55;
+}
+
+/* Faint engraved corner ticks inside each section's measure */
+/* Only the section's first measure gets ticks — a second .wrap
+   (Details' schedule, say) would otherwise double the ornament. */
+.section > .wrap { position: relative; }
+.section > .wrap:first-of-type::before,
+.section > .wrap:first-of-type::after {
+  content: "";
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  border: 0 solid rgba(176, 141, 79, 0.3);
+  pointer-events: none;
+}
+.section > .wrap:first-of-type::before {
+  top: clamp(-2.5rem, -4vh, -1.25rem);
+  left: 0;
+  border-top-width: 1px;
+  border-left-width: 1px;
+}
+.section > .wrap:first-of-type::after {
+  bottom: clamp(-2.5rem, -4vh, -1.25rem);
+  right: 0;
+  border-bottom-width: 1px;
+  border-right-width: 1px;
+}
+
+/* Eyebrows carry a tiny diamond, matching the section seam mark */
+.eyebrow::before {
+  content: "◆";
+  display: inline-block;
+  font-size: 0.5em;
+  letter-spacing: 0;
+  vertical-align: 0.25em;
+  margin-right: 0.9em;
+  opacity: 0.7;
+}
+
+/* Ink details */
+::selection { background: var(--gold-light); color: #2a2016; }
+
+:focus-visible {
+  outline: 1px solid var(--gold);
+  outline-offset: 4px;
+}
+
+/* Text links sweep a gold rule in from the left on hover */
+a:not([class]) {
+  text-decoration: none;
+  background-image: linear-gradient(var(--gold), var(--gold));
+  background-repeat: no-repeat;
+  background-position: 0 100%;
+  background-size: 0% 1px;
+  transition: background-size 0.45s var(--ease-out-expo);
+}
+a:not([class]):hover { background-size: 100% 1px; }
+
+@media (prefers-reduced-motion: reduce) {
+  a:not([class]) { transition: none; }
+}

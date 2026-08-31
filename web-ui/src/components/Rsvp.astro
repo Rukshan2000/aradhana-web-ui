@@ -1,0 +1,224 @@
+---
+import { couple, guest } from '../data/wedding.js';
+const rsvpBy = 'the first of November';
+---
+<section class="section rsvp" id="rsvp">
+  <div class="narrow" style="text-align:center">
+    <p class="eyebrow" data-reveal>Répondez s’il vous plaît</p>
+    <h2 data-split>Will you join us?</h2>
+    <p class="rsvp__lede" data-reveal style="--reveal-delay:200ms">
+      {guest.name}, kindly reply by {rsvpBy} so we can save your family a seat
+      — and a slice of cake.
+    </p>
+
+    <form class="form" data-rsvp data-stagger="80" novalidate>
+      <label class="field field--full" data-reveal="left">
+        <span>Full name</span>
+        <input
+          type="text"
+          name="name"
+          required
+          autocomplete="name"
+          placeholder="Your name"
+          value={`${guest.name} ${guest.household}`}
+        />
+      </label>
+
+      <fieldset class="field field--full choice" data-reveal="right">
+        <legend>Will you attend?</legend>
+        <div class="choice__options">
+          <label class="choice__option">
+            <input type="radio" name="attending" value="yes" required checked />
+            <span class="choice__box">
+              <span class="choice__mark" aria-hidden="true"></span>
+              <span class="choice__text">
+                <strong>Joyfully accepts</strong>
+                <em>We will be there</em>
+              </span>
+            </span>
+          </label>
+
+          <label class="choice__option">
+            <input type="radio" name="attending" value="no" />
+            <span class="choice__box">
+              <span class="choice__mark" aria-hidden="true"></span>
+              <span class="choice__text">
+                <strong>Regretfully declines</strong>
+                <em>We cannot make it</em>
+              </span>
+            </span>
+          </label>
+        </div>
+      </fieldset>
+
+      <label class="field field--full" data-reveal>
+        <span>A note for the couple</span>
+        <textarea name="note" rows="3" placeholder="Dietary needs, a song request, a blessing…"></textarea>
+      </label>
+
+      <div class="field field--full" data-reveal>
+        <button type="submit">Send our reply</button>
+      </div>
+
+      <p class="rsvp__thanks" data-rsvp-note hidden>
+        Thank you — your reply is noted. {couple.bride} and {couple.groom} cannot wait to see you.
+      </p>
+    </form>
+  </div>
+</section>
+
+<style>
+  .rsvp { background: var(--ivory-deep); border-top: var(--rule); }
+  .rsvp h2 { font-size: clamp(2rem, 5vw, 3.4rem); margin-bottom: 1.2rem; }
+  .rsvp__lede { color: var(--ink-soft); max-width: 32em; margin-inline: auto; }
+
+  .form {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1.4rem;
+    margin-top: 3rem;
+    text-align: left;
+  }
+  .field--full { grid-column: 1 / -1; }
+
+  /* ── Attendance: two visible cards, not a hidden dropdown ───── */
+  .choice { border: 0; padding: 0; margin: 0; }
+  .choice legend {
+    padding: 0;
+    margin-bottom: 0.55rem;
+    font-size: 0.62rem;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+  }
+  .choice__options {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr));
+    gap: 0.9rem;
+  }
+  .choice__option { cursor: pointer; }
+  .choice__option input {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+  .choice__box {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    height: 100%;
+    padding: 1rem 1.15rem;
+    border: 1px solid rgba(176, 141, 79, 0.35);
+    background: var(--ivory);
+    transition: border-color 0.35s ease, background 0.35s ease, box-shadow 0.35s ease;
+  }
+  .choice__mark {
+    position: relative;
+    flex: none;
+    width: 16px;
+    height: 16px;
+    border: 1px solid var(--gold);
+    border-radius: 50%;
+  }
+  .choice__mark::after {
+    content: "";
+    position: absolute;
+    inset: 3px;
+    border-radius: 50%;
+    background: var(--gold);
+    transform: scale(0);
+    transition: transform 0.35s var(--ease-out-expo);
+  }
+  .choice__text { display: grid; gap: 0.1rem; line-height: 1.35; }
+  .choice__text strong { font-weight: 400; font-size: 0.95rem; }
+  .choice__text em {
+    font-style: normal;
+    font-size: 0.72rem;
+    letter-spacing: 0.06em;
+    color: var(--ink-soft);
+  }
+
+  .choice__option:hover .choice__box { border-color: var(--gold); }
+  .choice__option input:focus-visible + .choice__box {
+    outline: 1px solid var(--gold);
+    outline-offset: 3px;
+  }
+  .choice__option input:checked + .choice__box {
+    border-color: var(--gold);
+    background: color-mix(in srgb, var(--gold) 8%, var(--ivory));
+    box-shadow: 0 14px 30px -24px rgba(0, 0, 0, 0.7);
+  }
+  .choice__option input:checked + .choice__box .choice__mark::after { transform: scale(1); }
+
+  @media (prefers-reduced-motion: reduce) {
+    .choice__box, .choice__mark::after { transition-duration: 0.01ms; }
+  }
+  .field { display: grid; gap: 0.55rem; }
+  .field > span {
+    font-size: 0.62rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--gold);
+  }
+  input, select, textarea, button {
+    font: inherit;
+    color: inherit;
+    width: 100%;
+    padding: 0.85rem 0;
+    background: transparent;
+    border: 0;
+    border-bottom: var(--rule);
+    border-radius: 0;
+    transition: border-color 0.4s var(--ease-out-expo);
+  }
+  textarea { resize: vertical; }
+  input:focus, select:focus, textarea:focus { outline: 0; border-bottom-color: var(--gold); }
+  input::placeholder, textarea::placeholder { color: rgba(93, 83, 71, 0.45); }
+
+  button {
+    justify-self: start;
+    width: auto;
+    min-width: 15rem;
+    margin-top: 1rem;
+    padding: 1.05rem 2.5rem;
+    border: 1px solid var(--gold);
+    background: transparent;
+    font-size: 0.68rem;
+    letter-spacing: 0.34em;
+    text-transform: uppercase;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    z-index: 0;
+  }
+  button::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: var(--gold);
+    transform: scaleX(0);
+    transform-origin: 0 50%;
+    transition: transform 0.65s var(--ease-out-expo);
+  }
+  button:hover:not(:disabled) { color: var(--ivory); }
+  button:hover:not(:disabled)::before { transform: scaleX(1); }
+  button:disabled { opacity: 0.45; cursor: default; }
+
+  .rsvp__thanks {
+    grid-column: 1 / -1;
+    margin: 0;
+    padding: 1.25rem 0 0;
+    border-top: var(--rule);
+    font-family: var(--font-display);
+    font-style: italic;
+    font-size: 1.3rem;
+    color: var(--gold);
+  }
+
+  @media (max-width: 620px) {
+    .form { grid-template-columns: 1fr; }
+    button { width: 100%; }
+  }
+</style>

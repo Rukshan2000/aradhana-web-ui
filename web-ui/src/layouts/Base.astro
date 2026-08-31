@@ -1,0 +1,46 @@
+---
+import '../styles/global.css';
+const { title, description } = Astro.props;
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="preconnect" href="https://images.unsplash.com" />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Jost:wght@200;300;400&display=swap"
+    />
+  </head>
+  <body>
+    <div class="progress" aria-hidden="true"><span data-progress></span></div>
+    <slot />
+    <script>
+      import '../scripts/motion.js';
+    </script>
+    <style>
+      .progress {
+        position: fixed;
+        inset: 0 0 auto 0;
+        height: 2px;
+        z-index: 90;
+        pointer-events: none;
+      }
+      .progress span {
+        display: block;
+        height: 100%;
+        background: linear-gradient(90deg, var(--gold-light), var(--gold));
+        transform: scaleX(0);
+        transform-origin: 0 50%;
+      }
+    </style>
+  </body>
+</html>
