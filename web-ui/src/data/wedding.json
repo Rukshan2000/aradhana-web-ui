@@ -9,7 +9,9 @@
     "city": "Kandy, Sri Lanka"
   },
   "guest": {
-    "name": "Kevin Perea",
+    "id": "G000",
+    "slug": "",
+    "name": "Our Cherished Guest",
     "household": "and Family"
   },
   "hero": {

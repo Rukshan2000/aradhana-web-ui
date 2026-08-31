@@ -1,5 +1,6 @@
 ---
-import { couple, guest, rsvp } from '../data/wedding.js';
+import { couple, guest as fallbackGuest, rsvp } from '../data/wedding.js';
+const { guest = fallbackGuest } = Astro.props;
 const rsvpBy = rsvp.replyBy;
 ---
 <section class="section rsvp" id="rsvp">
@@ -12,6 +13,8 @@ const rsvpBy = rsvp.replyBy;
     </p>
 
     <form class="form" data-rsvp data-stagger="80" novalidate>
+      <input type="hidden" name="guestId" value={guest.id} />
+      <input type="hidden" name="guestSlug" value={guest.slug} />
       <label class="field field--full" data-reveal="left">
         <span>Full name</span>
         <input

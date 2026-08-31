@@ -1,0 +1,13 @@
+---
+/* A page per household: /kevin, /rukshan, … one for every JSON file in
+   src/data/guests/. Unknown slugs are not built, so they 404. */
+import Invite from '../layouts/Invite.astro';
+import { guests } from '../data/wedding.js';
+
+export function getStaticPaths() {
+  return guests.map((guest) => ({ params: { guest: guest.slug }, props: { guest } }));
+}
+
+const { guest } = Astro.props;
+---
+<Invite guest={guest} />

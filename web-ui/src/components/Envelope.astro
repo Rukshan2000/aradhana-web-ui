@@ -1,5 +1,6 @@
 ---
-import { couple, guest } from '../data/wedding.js';
+import { couple, guest as fallbackGuest } from '../data/wedding.js';
+const { guest = fallbackGuest } = Astro.props;
 ---
 <div class="envelope" id="envelope" data-envelope>
   <div class="envelope__veil" aria-hidden="true"></div>
