@@ -1,0 +1,177 @@
+---
+/* Page music. Nothing plays until the visitor opens the invitation —
+   that click is the user gesture browsers require before audio may start. */
+const track = '/audio/Christina Perri - A Thousand Years.mp3';
+---
+<audio data-music loop preload="none" src={encodeURI(track)}></audio>
+
+<button type="button" class="music" data-music-toggle hidden aria-pressed="true">
+  <span class="music__bars" aria-hidden="true">
+    <i></i><i></i><i></i><i></i>
+  </span>
+  <span class="music__label" data-music-label>Music on</span>
+</button>
+
+<style>
+  .music {
+    position: fixed;
+    left: clamp(0.9rem, 2.5vw, 2rem);
+    bottom: clamp(0.9rem, 2.5vw, 2rem);
+    z-index: 120;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.6rem 0.95rem;
+    border: 1px solid rgba(176, 141, 79, 0.5);
+    border-radius: 999px;
+    background: rgba(34, 29, 23, 0.55);
+    backdrop-filter: blur(6px);
+    color: var(--ivory);
+    font-family: var(--font-body);
+    font-size: 0.58rem;
+    letter-spacing: 0.26em;
+    text-transform: uppercase;
+    cursor: pointer;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: opacity 0.6s ease, transform 0.6s var(--ease-out-expo),
+      border-color 0.4s ease, background 0.4s ease;
+  }
+  .music[hidden] { display: none; }
+  .music.is-shown { opacity: 1; transform: none; }
+  .music:hover { border-color: var(--gold); background: rgba(34, 29, 23, 0.75); }
+
+  /* Four bars that dance while the track plays and rest when muted */
+  .music__bars {
+    display: flex;
+    align-items: flex-end;
+    gap: 2px;
+    width: 14px;
+    height: 13px;
+  }
+  .music__bars i {
+    flex: 1;
+    height: 30%;
+    background: var(--gold-light);
+    transform-origin: 50% 100%;
+    animation: eq 900ms ease-in-out infinite alternate;
+  }
+  .music__bars i:nth-child(2) { animation-duration: 620ms; }
+  .music__bars i:nth-child(3) { animation-duration: 1080ms; }
+  .music__bars i:nth-child(4) { animation-duration: 760ms; }
+
+  .music[aria-pressed="false"] .music__bars i {
+    animation-play-state: paused;
+    height: 30%;
+    opacity: 0.45;
+  }
+
+  @keyframes eq {
+    from { height: 25%; }
+    to   { height: 100%; }
+  }
+
+  .music__label { line-height: 1; }
+
+  @media (max-width: 520px) {
+    .music__label { display: none; }
+    .music { padding: 0.65rem; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .music { transition: none; }
+    .music__bars i { animation: none; height: 60%; }
+  }
+</style>
+
+<script>
+  const initMusic = () => {
+    const audio = document.querySelector('[data-music]') as HTMLAudioElement | null;
+    const toggle = document.querySelector('[data-music-toggle]') as HTMLButtonElement | null;
+    const label = document.querySelector('[data-music-label]') as HTMLElement | null;
+    if (!audio || !toggle || audio.dataset.ready === '1') return;
+    audio.dataset.ready = '1';
+
+    const TARGET = 0.55;
+    const STORE = 'wedding:music-muted';
+    let started = false;
+    let fade = 0;
+
+    const wantsSound = () => localStorage.getItem(STORE) !== '1';
+
+    /* Ease the volume up rather than dropping the visitor straight into
+       a chorus the moment the envelope opens. */
+    const fadeIn = () => {
+      cancelAnimationFrame(fade);
+      const from = performance.now();
+      const step = (now: number) => {
+        const t = Math.min(1, (now - from) / 2600);
+        audio.volume = TARGET * t;
+        if (t < 1) fade = requestAnimationFrame(step);
+      };
+      fade = requestAnimationFrame(step);
+    };
+
+    const reflect = (on: boolean) => {
+      toggle.setAttribute('aria-pressed', String(on));
+      if (label) label.textContent = on ? 'Music on' : 'Music off';
+    };
+
+    const start = () => {
+      if (started) return;
+      started = true;
+
+      toggle.hidden = false;
+      requestAnimationFrame(() => toggle.classList.add('is-shown'));
+
+      if (!wantsSound()) {
+        reflect(false);
+        return;
+      }
+
+      audio.volume = 0;
+      audio.play().then(
+        () => {
+          reflect(true);
+          fadeIn();
+        },
+        () => {
+          // Browser refused despite the gesture — show it as off so the
+          // visitor can start it themselves from the control.
+          reflect(false);
+        }
+      );
+    };
+
+    /* The open button is the gesture. Listening on the button itself (in
+       capture, before the envelope's own handler) keeps play() inside the
+       user-activation window, which the animation's later callback is not. */
+    const openBtn = document.querySelector('[data-open-invitation]');
+    openBtn?.addEventListener('click', start, { capture: true, once: true });
+    window.addEventListener('invitation:open', start, { once: true });
+
+    // No envelope on the page (or it was skipped) — fall back to the first
+    // interaction of any kind.
+    ['pointerdown', 'keydown'].forEach((evt) =>
+      window.addEventListener(evt, start, { once: true, passive: true })
+    );
+
+    toggle.addEventListener('click', () => {
+      if (audio.paused) {
+        localStorage.removeItem(STORE);
+        audio.volume = 0;
+        audio.play().then(() => {
+          reflect(true);
+          fadeIn();
+        }, () => reflect(false));
+      } else {
+        localStorage.setItem(STORE, '1');
+        audio.pause();
+        reflect(false);
+      }
+    });
+  };
+
+  initMusic();
+  document.addEventListener('astro:page-load', initMusic);
+</script>
