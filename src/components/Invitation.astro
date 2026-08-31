@@ -1,5 +1,6 @@
 ---
-import { couple, guest } from '../data/wedding.js';
+import { couple, guest as fallbackGuest } from '../data/wedding.js';
+const { guest = fallbackGuest } = Astro.props;
 ---
 <section class="section invitation" id="invitation">
   <div class="narrow" style="text-align:center">
