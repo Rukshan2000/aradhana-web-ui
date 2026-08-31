@@ -3,7 +3,7 @@
    that click is the user gesture browsers require before audio may start. */
 const track = '/audio/Christina Perri - A Thousand Years.mp3';
 ---
-<audio data-music loop preload="none" src={encodeURI(track)}></audio>
+<audio data-music loop preload="metadata" playsinline src={encodeURI(track)}></audio>
 
 <button type="button" class="music" data-music-toggle hidden aria-pressed="true">
   <span class="music__bars" aria-hidden="true">
@@ -101,10 +101,22 @@ const track = '/audio/Christina Perri - A Thousand Years.mp3';
 
     const wantsSound = () => localStorage.getItem(STORE) !== '1';
 
+    /* iOS Safari ignores writes to .volume (the hardware buttons own it).
+       Probing once tells us whether a fade is even possible. */
+    let volumeWorks = true;
+    try {
+      audio.volume = 0.5;
+      volumeWorks = Math.abs(audio.volume - 0.5) < 0.01;
+      audio.volume = 1;
+    } catch {
+      volumeWorks = false;
+    }
+
     /* Ease the volume up rather than dropping the visitor straight into
        the middle of a phrase. Eased rather than linear, so the swell is
        gentle at the start and settles smoothly at the top. */
     const fadeIn = () => {
+      if (!volumeWorks) return; // nothing to ramp — iOS plays at device volume
       cancelAnimationFrame(fade);
       const from = performance.now();
       const step = (now: number) => {
@@ -115,7 +127,7 @@ const track = '/audio/Christina Perri - A Thousand Years.mp3';
       fade = requestAnimationFrame(step);
     };
 
-    /* Seeking needs metadata; with preload="none" it may not be there yet,
+    /* Seeking needs metadata, which may not have arrived yet,
        so wait for it rather than silently starting from zero. Every loop
        returns to the same in-point. */
     const seekToStart = () =>
@@ -144,7 +156,7 @@ const track = '/audio/Christina Perri - A Thousand Years.mp3';
     };
 
     const start = () => {
-      if (started) return;
+      if (started || !audio.paused) return;
       started = true;
 
       toggle.hidden = false;
@@ -155,11 +167,10 @@ const track = '/audio/Christina Perri - A Thousand Years.mp3';
         return;
       }
 
-      audio.volume = 0;
-      audio.load();
-      // play() must be called on the gesture, not after an await, or the
-      // activation window is gone; the seek is applied as soon as metadata
-      // lands, which is well inside the fade.
+      if (volumeWorks) audio.volume = 0;
+      // play() must be called synchronously on the gesture — no await, and
+      // no load() first, either of which can cost the activation window on
+      // iOS. The seek is applied as soon as metadata lands.
       const playing = audio.play();
       seekToStart();
       playing.then(
@@ -167,10 +178,14 @@ const track = '/audio/Christina Perri - A Thousand Years.mp3';
           reflect(true);
           fadeIn();
         },
-        () => {
-          // Browser refused despite the gesture — show it as off so the
-          // visitor can start it themselves from the control.
+        (err) => {
+          // Refused despite the gesture (happens on mobile). Leave the
+          // control inviting so a direct tap on it can start the track,
+          // and allow the tap-retry above to try again.
+          started = false;
           reflect(false);
+          if (label) label.textContent = 'Play music';
+          console.warn('[music] playback refused:', err?.name, err?.message);
         }
       );
     };
@@ -179,19 +194,29 @@ const track = '/audio/Christina Perri - A Thousand Years.mp3';
        capture, before the envelope's own handler) keeps play() inside the
        user-activation window, which the animation's later callback is not. */
     const openBtn = document.querySelector('[data-open-invitation]');
-    openBtn?.addEventListener('click', start, { capture: true, once: true });
-    window.addEventListener('invitation:open', start, { once: true });
+    openBtn?.addEventListener('click', start, { capture: true });
+    window.addEventListener('invitation:open', start);
 
-    // No envelope on the page (or it was skipped) — fall back to the first
-    // interaction of any kind.
-    ['pointerdown', 'keydown'].forEach((evt) =>
-      window.addEventListener(evt, start, { once: true, passive: true })
+    /* Keep trying on every subsequent tap until the track is actually
+       running. Mobile Chrome will refuse a play() for reasons we cannot
+       see from here (autoplay setting, a gesture it did not count), and a
+       single once-only attempt would leave the page permanently silent. */
+    const retry = () => {
+      if (audio.paused && wantsSound()) start();
+      if (!audio.paused) {
+        ['pointerdown', 'touchend', 'keydown'].forEach((evt) =>
+          window.removeEventListener(evt, retry)
+        );
+      }
+    };
+    ['pointerdown', 'touchend', 'keydown'].forEach((evt) =>
+      window.addEventListener(evt, retry, { passive: true })
     );
 
     toggle.addEventListener('click', () => {
       if (audio.paused) {
         localStorage.removeItem(STORE);
-        audio.volume = 0;
+        if (volumeWorks) audio.volume = 0;
         if (audio.currentTime < 1) seekToStart();
         audio.play().then(() => {
           reflect(true);
