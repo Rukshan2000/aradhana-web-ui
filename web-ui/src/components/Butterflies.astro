@@ -288,11 +288,12 @@ const butterflies = Array.from({ length: COUNT }, (_, i) => i);
           return;
         }
 
-        // Nose follows the bob; flip the whole butterfly when heading left
+        // Nose follows the bob. The drawing's own heading is mirrored from
+        // its travel direction, so the scaleX sign is inverted.
         const tilt = Math.sin(f.phase) * 8;
         f.el.style.transform =
           `translate3d(${f.x.toFixed(1)}px, ${f.y.toFixed(1)}px, 0) ` +
-          `scaleX(${f.dir}) rotate(${tilt.toFixed(1)}deg) scale(${f.scale.toFixed(3)})`;
+          `scaleX(${-f.dir}) rotate(${tilt.toFixed(1)}deg) scale(${f.scale.toFixed(3)})`;
       });
 
       raf = requestAnimationFrame(frame);
