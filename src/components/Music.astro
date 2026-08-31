@@ -1,9 +1,18 @@
 ---
 /* Page music. Nothing plays until the visitor opens the invitation —
    that click is the user gesture browsers require before audio may start. */
-const track = '/audio/Christina Perri - A Thousand Years.mp3';
+import { music } from '../data/wedding.js';
+const track = music.track;
 ---
-<audio data-music loop preload="metadata" playsinline src={encodeURI(track)}></audio>
+<audio
+  data-music
+  loop
+  preload="metadata"
+  playsinline
+  src={encodeURI(track)}
+  data-start-at={music.startAt}
+  data-volume={music.volume}
+></audio>
 
 <button type="button" class="music" data-music-toggle hidden aria-pressed="true">
   <span class="music__bars" aria-hidden="true">
@@ -92,8 +101,8 @@ const track = '/audio/Christina Perri - A Thousand Years.mp3';
     if (!audio || !toggle || audio.dataset.ready === '1') return;
     audio.dataset.ready = '1';
 
-    const TARGET = 0.55;
-    const START_AT = 14;   // skip the intro — come in on the verse
+    const TARGET = Number(audio.dataset.volume) || 0.55;
+    const START_AT = Number(audio.dataset.startAt) || 0;   // skip the intro
     const FADE_MS = 3200;
     const STORE = 'wedding:music-muted';
     let started = false;

@@ -1,5 +1,5 @@
 ---
-import { couple } from '../data/wedding.js';
+import { couple, credit } from '../data/wedding.js';
 ---
 <footer class="footer">
   <div class="narrow" style="text-align:center">
@@ -19,8 +19,8 @@ import { couple } from '../data/wedding.js';
     </nav>
     <p class="footer__credit">
       Powered by
-      <a href="https://www.kwingsmedia.com" target="_blank" rel="noopener">KWings Media</a>
-      <span class="footer__site">www.kwingsmedia.com</span>
+      <a href={credit.url} target="_blank" rel="noopener">{credit.label}</a>
+      <span class="footer__site">{credit.site}</span>
     </p>
   </div>
 </footer>
