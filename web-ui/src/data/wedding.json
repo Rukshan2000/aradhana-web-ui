@@ -1,0 +1,155 @@
+{
+  "couple": {
+    "bride": "Tharu",
+    "groom": "Sithika",
+    "hashtag": "#AradhanaWedsSithika",
+    "date": "2026-12-12T16:30:00+05:30",
+    "dateLabel": "Saturday, the twelfth of December",
+    "yearLabel": "Two thousand twenty six",
+    "city": "Kandy, Sri Lanka"
+  },
+  "guest": {
+    "name": "Kevin Perea",
+    "household": "and Family"
+  },
+  "hero": {
+    "src": "https://images.unsplash.com/photo-1537633552985-df8429e8048b?auto=format&fit=crop&w=2000&h=1250&q=80",
+    "alt": "The couple beneath a flowing veil on the shore at dusk"
+  },
+  "story": [
+    {
+      "year": "2019",
+      "title": "The first evening",
+      "text": "A mutual friend’s birthday, a crowded rooftop, and a conversation that outlasted everyone else at the table.",
+      "photo": "https://images.unsplash.com/photo-1460978812857-470ed1c77af0?auto=format&fit=crop&w=900&h=1200&q=80",
+      "alt": "Black and white portrait of the couple beneath a veil"
+    },
+    {
+      "year": "2022",
+      "title": "The long way home",
+      "text": "Two cities, a hundred train journeys, and the slow discovery that the distance never once felt like doubt.",
+      "photo": "https://images.unsplash.com/photo-1478146896981-b80fe463b330?auto=format&fit=crop&w=900&h=1200&q=80",
+      "alt": "Bride in a floral dress on an open road"
+    },
+    {
+      "year": "2025",
+      "title": "The question",
+      "text": "On a quiet morning by the lake, with no audience and no rehearsal — just yes, and then laughter, and then tea.",
+      "photo": "https://images.unsplash.com/photo-1591604466107-ec97de577aff?auto=format&fit=crop&w=900&h=1200&q=80",
+      "alt": "The couple together in the golden light of autumn"
+    }
+  ],
+  "gallery": [
+    {
+      "src": "https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=1000&h=1400&q=80",
+      "alt": "Groom holding the bridal bouquet",
+      "span": "tall"
+    },
+    {
+      "src": "https://images.unsplash.com/photo-1465495976277-4387d4b0b4c6?auto=format&fit=crop&w=1200&h=900&q=80",
+      "alt": "Joined hands and wedding rings above a bouquet",
+      "span": "wide"
+    },
+    {
+      "src": "https://images.unsplash.com/photo-1583939003579-730e3918a45a?auto=format&fit=crop&w=1000&h=1000&q=80",
+      "alt": "Confetti thrown over the couple as they kiss",
+      "span": ""
+    },
+    {
+      "src": "https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&w=1200&h=900&q=80",
+      "alt": "Ceremony beside the water with balloons released",
+      "span": ""
+    },
+    {
+      "src": "https://images.unsplash.com/photo-1606216794074-735e91aa2c92?auto=format&fit=crop&w=1000&h=1400&q=80",
+      "alt": "The wedding party walking beneath palms",
+      "span": "tall"
+    },
+    {
+      "src": "https://images.unsplash.com/photo-1519225421980-715cb0215aed?auto=format&fit=crop&w=1200&h=900&q=80",
+      "alt": "Long reception table set with wildflowers",
+      "span": "wide"
+    }
+  ],
+  "galleryPool": [
+    {
+      "src": "https://images.unsplash.com/photo-1522673607200-164d1b6ce486?auto=format&fit=crop&w=1200&h=900&q=80",
+      "alt": "Guests raising glasses at the reception"
+    },
+    {
+      "src": "https://images.unsplash.com/photo-1507504031003-b417219a0fde?auto=format&fit=crop&w=1000&h=1400&q=80",
+      "alt": "The bride adjusting her veil before the ceremony"
+    },
+    {
+      "src": "https://images.unsplash.com/photo-1520854221256-17451cc331bf?auto=format&fit=crop&w=1200&h=900&q=80",
+      "alt": "First dance under warm string lights"
+    },
+    {
+      "src": "https://images.unsplash.com/photo-1478146896981-b80fe463b330?auto=format&fit=crop&w=1000&h=1400&q=80",
+      "alt": "The couple walking an open road at golden hour"
+    },
+    {
+      "src": "https://images.unsplash.com/photo-1525772764200-be829a350797?auto=format&fit=crop&w=1200&h=900&q=80",
+      "alt": "Wedding cake dressed with fresh flowers"
+    }
+  ],
+  "details": [
+    {
+      "label": "The Ceremony",
+      "time": "4:30 in the afternoon",
+      "venue": "St. Anne’s Chapel",
+      "address": "14 Temple Lane, Kandy",
+      "note": "Guests are asked to be seated by 4:15."
+    },
+    {
+      "label": "The Reception",
+      "time": "7:00 in the evening",
+      "venue": "The Lakeside Pavilion",
+      "address": "Rajapihilla Mawatha, Kandy",
+      "note": "Dinner, dancing, and far too much cake."
+    }
+  ],
+  "schedule": [
+    {
+      "time": "4:30 pm",
+      "event": "Ceremony"
+    },
+    {
+      "time": "5:30 pm",
+      "event": "Golden-hour photographs"
+    },
+    {
+      "time": "6:30 pm",
+      "event": "Cocktails on the terrace"
+    },
+    {
+      "time": "7:00 pm",
+      "event": "Dinner is served"
+    },
+    {
+      "time": "8:30 pm",
+      "event": "Toasts & first dance"
+    },
+    {
+      "time": "12:00 am",
+      "event": "Farewell sparklers"
+    }
+  ],
+  "venuePhoto": {
+    "src": "https://images.unsplash.com/photo-1522673607200-164d1b6ce486?auto=format&fit=crop&w=1800&h=1100&q=80",
+    "alt": "Two ceremony chairs set on a lawn overlooking the water"
+  },
+  "rsvp": {
+    "replyBy": "the first of November"
+  },
+  "music": {
+    "track": "/audio/Christina Perri - A Thousand Years.mp3",
+    "startAt": 14,
+    "volume": 0.55
+  },
+  "credit": {
+    "label": "Kwings Media",
+    "url": "https://www.kwingsmedia.com",
+    "site": "www.kwingsmedia.com"
+  }
+}
