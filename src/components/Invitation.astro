@@ -1,0 +1,172 @@
+---
+import { couple, guest } from '../data/wedding.js';
+---
+<section class="section invitation" id="invitation">
+  <div class="narrow" style="text-align:center">
+    <p class="eyebrow" data-reveal>The invitation</p>
+
+    <div class="plate" data-reveal style="--reveal-delay:80ms">
+      <span class="plate__rule" aria-hidden="true"></span>
+      <p class="plate__to">Especially for</p>
+      <p class="plate__name script">{guest.name}</p>
+      <p class="plate__household">{guest.household}</p>
+      <span class="plate__rule" aria-hidden="true"></span>
+    </div>
+
+    <h2 class="invitation__head" data-split>You are invited to celebrate</h2>
+    <div class="ornament" data-reveal style="--reveal-delay:200ms">✦</div>
+    <p class="invitation__body" data-reveal style="--reveal-delay:320ms">
+      With hearts full of gratitude, {couple.bride} and {couple.groom} request the pleasure
+      of your company as they exchange vows and begin their life together.
+    </p>
+    <p class="invitation__date" data-reveal style="--reveal-delay:440ms">
+      <span>{couple.dateLabel}</span>
+      <span class="script">{couple.yearLabel}</span>
+      <span>{couple.city}</span>
+    </p>
+
+    <a class="confirm" href="#rsvp" data-reveal style="--reveal-delay:560ms">
+      <span class="confirm__fill" aria-hidden="true"></span>
+      <span class="confirm__label">
+        <span class="confirm__text">Confirm participation</span>
+        <span class="confirm__text confirm__text--alt" aria-hidden="true">Confirm participation</span>
+      </span>
+      <svg class="confirm__icon" viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M4 12.5l5 5L20 6.5" />
+      </svg>
+    </a>
+  </div>
+</section>
+
+<style>
+  .invitation { background: var(--ivory); }
+  .invitation__head {
+    font-size: clamp(2rem, 5.5vw, 3.6rem);
+    margin-bottom: 2rem;
+  }
+  .ornament { margin: 2rem 0; font-size: 0.7rem; }
+  .invitation__body {
+    font-size: clamp(1.05rem, 1.6vw, 1.25rem);
+    color: var(--ink-soft);
+    max-width: 34em;
+    margin-inline: auto;
+  }
+  .invitation__date {
+    display: grid;
+    gap: 0.4rem;
+    margin-top: 2.5rem;
+    font-size: 0.78rem;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: var(--ink);
+  }
+  /* ── Addressed plate ──────────────────────────────────────── */
+  .plate {
+    display: grid;
+    justify-items: center;
+    gap: 0.35rem;
+    margin: 0 auto 2.5rem;
+    padding: 1.6rem 2rem;
+    max-width: 26rem;
+    border: var(--rule);
+    background: color-mix(in srgb, var(--gold) 5%, var(--ivory));
+  }
+  .plate__rule {
+    width: 46px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  }
+  .plate__to {
+    margin: 0.6rem 0 0;
+    font-size: 0.6rem;
+    letter-spacing: 0.42em;
+    text-transform: uppercase;
+    color: var(--gold);
+  }
+  .plate__name {
+    margin: 0;
+    font-size: clamp(1.8rem, 4.5vw, 2.6rem);
+    line-height: 1.15;
+    color: var(--ink);
+  }
+  .plate__household {
+    margin: 0 0 0.6rem;
+    font-size: 0.68rem;
+    letter-spacing: 0.34em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+  }
+
+  /* ── Confirm participation ────────────────────────────────── */
+  .confirm {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.7rem;
+    margin-top: 2.8rem;
+    padding: 1rem 2rem;
+    border: 1px solid var(--gold);
+    text-decoration: none;
+    color: var(--ink);
+    font-size: 0.68rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    overflow: hidden;
+    isolation: isolate;
+    transition: box-shadow 0.5s ease;
+  }
+  .confirm__fill {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: var(--gold);
+    transform: scaleY(0);
+    transform-origin: 50% 100%;
+    transition: transform 0.55s var(--ease-out-expo);
+  }
+  .confirm:hover .confirm__fill,
+  .confirm:focus-visible .confirm__fill { transform: scaleY(1); }
+  .confirm:hover, .confirm:focus-visible { box-shadow: 0 18px 40px -26px rgba(0, 0, 0, 0.6); }
+
+  .confirm__label {
+    position: relative;
+    display: block;
+    overflow: hidden;
+    line-height: 1.5;
+    height: 1.5em;
+  }
+  .confirm__text {
+    display: block;
+    line-height: 1.5;
+    transition: transform 0.55s var(--ease-out-expo), color 0.4s ease;
+  }
+  .confirm__text--alt { position: absolute; inset: 0; transform: translateY(100%); }
+  .confirm:hover .confirm__text:not(.confirm__text--alt),
+  .confirm:focus-visible .confirm__text:not(.confirm__text--alt) { transform: translateY(-100%); }
+  .confirm:hover .confirm__text--alt,
+  .confirm:focus-visible .confirm__text--alt { transform: translateY(0); color: var(--ivory); }
+
+  .confirm__icon {
+    width: 15px;
+    height: 15px;
+    flex: none;
+    fill: none;
+    stroke: var(--gold);
+    stroke-width: 1.6;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    transition: stroke 0.4s ease, transform 0.55s var(--ease-out-expo);
+  }
+  .confirm:hover .confirm__icon,
+  .confirm:focus-visible .confirm__icon { stroke: var(--ivory); transform: scale(1.15); }
+
+  @media (prefers-reduced-motion: reduce) {
+    .confirm, .confirm__fill, .confirm__text, .confirm__icon { transition-duration: 0.01ms; }
+  }
+
+  .invitation__date .script {
+    font-size: 1.6rem;
+    letter-spacing: 0.02em;
+    text-transform: none;
+  }
+</style>

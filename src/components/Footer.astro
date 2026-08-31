@@ -1,0 +1,81 @@
+---
+import { couple } from '../data/wedding.js';
+---
+<footer class="footer">
+  <div class="narrow" style="text-align:center">
+    <div class="ornament" data-reveal>✦</div>
+    <p class="footer__names script" data-reveal style="--reveal-delay:150ms">
+      {couple.bride} &amp; {couple.groom}
+    </p>
+    <p class="footer__meta" data-reveal style="--reveal-delay:280ms">
+      {couple.dateLabel} · {couple.city}
+    </p>
+    <nav class="footer__nav" data-reveal="left" style="--reveal-delay:400ms">
+      <a href="#invitation">Invitation</a>
+      <a href="#story">Story</a>
+      <a href="#gallery">Gallery</a>
+      <a href="#details">Details</a>
+      <a href="#rsvp">RSVP</a>
+    </nav>
+    <p class="footer__credit">
+      Powered by
+      <a href="https://www.kwingsmedia.com" target="_blank" rel="noopener">KWings Media</a>
+      <span class="footer__site">www.kwingsmedia.com</span>
+    </p>
+  </div>
+</footer>
+
+<style>
+  .footer {
+    background: var(--ink);
+    color: var(--ivory);
+    padding: clamp(4rem, 10vh, 7rem) var(--gutter) 3rem;
+  }
+  .footer .ornament { color: var(--gold); margin-bottom: 2rem; font-size: 0.7rem; }
+  .footer__names { font-size: clamp(2.4rem, 7vw, 4rem); margin: 0 0 0.6rem; }
+  .footer__meta {
+    font-size: 0.68rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: rgba(251, 248, 243, 0.6);
+  }
+  .footer__nav {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 1.5rem;
+    margin: 2.5rem 0 3rem;
+  }
+  .footer__nav a {
+    font-size: 0.65rem;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    text-decoration: none;
+    padding-bottom: 0.3rem;
+    border-bottom: 1px solid transparent;
+    transition: border-color 0.5s var(--ease-out-expo);
+  }
+  .footer__nav a:hover { border-bottom-color: var(--gold); }
+  .footer__site {
+    display: block;
+    margin-top: 0.35rem;
+    font-size: 0.7rem;
+    letter-spacing: 0.22em;
+    text-transform: lowercase;
+    color: var(--gold);
+  }
+  .footer__credit {
+    margin: 0;
+    font-size: 0.7rem;
+    color: rgba(251, 248, 243, 0.4);
+  }
+  /* The studio name should read clearly against the muted credit line */
+  .footer__credit a {
+    color: rgba(251, 248, 243, 0.78);
+    text-decoration: none;
+    letter-spacing: 0.08em;
+    border-bottom: 1px solid transparent;
+    transition: color 0.4s ease, border-color 0.4s ease;
+  }
+  .footer__credit a:hover { color: var(--gold-light); border-bottom-color: var(--gold); }
+</style>

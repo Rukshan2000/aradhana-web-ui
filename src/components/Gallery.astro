@@ -1,0 +1,169 @@
+---
+import { gallery, galleryPool } from '../data/wedding.js';
+---
+<section class="section gallery" id="gallery">
+  <div class="wrap">
+    <header class="gallery__head">
+      <p class="eyebrow" data-reveal>Moments</p>
+      <h2 data-split>A few of our favourites</h2>
+    </header>
+
+    <div class="grid" data-gallery data-pool={JSON.stringify(galleryPool)}>
+      {gallery.map((photo, i) => (
+        <figure
+          class={`tile tile--${photo.span || 'plain'}`}
+          data-curtain
+          data-wipe={i % 2 ? 'right' : 'left'}
+          data-from={i % 2 ? 'right' : 'left'}
+        >
+          <span class="tile__layer" data-axis="x" data-parallax={i % 2 ? 0.2 : -0.2}>
+            <img
+              class="tile__img is-active"
+              data-face="a"
+              src={photo.src}
+              alt={photo.alt}
+              loading="lazy"
+              decoding="async"
+            />
+            <img class="tile__img" data-face="b" alt="" aria-hidden="true" decoding="async" />
+          </span>
+        </figure>
+      ))}
+    </div>
+  </div>
+</section>
+
+<style>
+  .gallery { background: var(--ivory-deep); }
+  .gallery__head { text-align: center; margin-bottom: clamp(2.5rem, 7vh, 5rem); }
+  .gallery__head h2 { font-size: clamp(2rem, 5vw, 3.4rem); }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-auto-rows: clamp(120px, 17vw, 220px);
+    gap: clamp(0.6rem, 1.6vw, 1.4rem);
+  }
+
+  .tile { position: relative; margin: 0; overflow: hidden; background: var(--ivory); grid-column: span 2; grid-row: span 1; }
+  .tile--tall { grid-column: span 2; grid-row: span 2; }
+  .tile--wide { grid-column: span 2; grid-row: span 1; }
+
+  /* The layer is oversized so the parallax shift never exposes an edge */
+  /* Absolutely positioned so the overhang is a share of HEIGHT — a
+     percentage margin would resolve against width and leave a gap. */
+  .tile__layer {
+    position: absolute;
+    left: -11%;
+    right: -11%;
+    top: -6%;
+    height: 112%;
+    will-change: transform;
+  }
+  .tile__img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0;
+    z-index: 0;
+    transition: opacity 1.1s ease;
+  }
+  /* The outgoing photo stays fully opaque underneath the incoming one,
+     so a tile is never partly transparent mid-fade. */
+  .tile__img.is-active { opacity: 1; z-index: 1; }
+  .tile__img.is-entering { z-index: 2; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .tile__img { transition-duration: 0.01ms; }
+  }
+
+  @media (max-width: 700px) {
+    .grid { grid-template-columns: repeat(2, 1fr); }
+    .tile, .tile--wide, .tile--tall { grid-column: span 2; grid-row: span 1; }
+    .tile { aspect-ratio: 4 / 3; }
+    .grid { grid-auto-rows: auto; }
+  }
+</style>
+
+<script>
+  const initGallery = () => {
+    const grid = document.querySelector('[data-gallery]');
+    if (!grid || grid.dataset.ready === '1') return;
+    grid.dataset.ready = '1';
+
+    let pool;
+    try {
+      pool = JSON.parse(grid.dataset.pool || '[]');
+    } catch {
+      return;
+    }
+    if (!pool.length) return;
+
+    const tiles = [...grid.querySelectorAll('.tile')].map((tile) => ({
+      a: tile.querySelector('[data-face="a"]'),
+      b: tile.querySelector('[data-face="b"]'),
+      front: 'a',
+      busy: false,
+    }));
+    if (!tiles.length) return;
+
+    /* Photos waiting off-screen; a tile's outgoing photo returns here so
+       nothing is ever shown twice at once. */
+    const queue = pool.slice();
+    let visible = true;
+
+    const swapOne = () => {
+      if (!visible || document.hidden || !queue.length) return;
+
+      const free = tiles.filter((t) => !t.busy);
+      if (!free.length) return;
+
+      const tile = free[Math.floor(Math.random() * free.length)];
+      const next = queue.splice(Math.floor(Math.random() * queue.length), 1)[0];
+      const showing = tile[tile.front];
+      const hidden = tile[tile.front === 'a' ? 'b' : 'a'];
+
+      tile.busy = true;
+      const img = new Image();
+      img.decoding = 'async';
+      img.onload = () => {
+        const outgoing = { src: showing.src, alt: showing.alt };
+
+        /* Fade the new photo in ON TOP; the old one keeps covering the
+           tile until the fade is over, so no background ever shows. */
+        hidden.classList.remove('is-active');
+        hidden.classList.add('is-entering');
+        hidden.src = next.src;
+        hidden.alt = next.alt;
+        void hidden.offsetWidth;
+        hidden.classList.add('is-active');
+        hidden.removeAttribute('aria-hidden');
+        tile.front = tile.front === 'a' ? 'b' : 'a';
+
+        setTimeout(() => {
+          showing.classList.remove('is-active');
+          showing.setAttribute('aria-hidden', 'true');
+          hidden.classList.remove('is-entering');
+          queue.push(outgoing);
+          tile.busy = false;
+        }, 1200);
+      };
+      img.onerror = () => { tile.busy = false; };
+      img.src = next.src;
+    };
+
+    setInterval(swapOne, 3200);
+
+    if ('IntersectionObserver' in window) {
+      new IntersectionObserver(
+        ([entry]) => { visible = entry.isIntersecting; },
+        { threshold: 0 }
+      ).observe(grid);
+    }
+  };
+
+  initGallery();
+  document.addEventListener('astro:page-load', initGallery);
+</script>

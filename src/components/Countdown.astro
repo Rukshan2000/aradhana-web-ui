@@ -1,0 +1,187 @@
+---
+import { couple } from '../data/wedding.js';
+const units = ['days', 'hours', 'minutes', 'seconds'];
+
+// Meadow: deterministic pseudo-random so SSR and client agree.
+const rand = (i, salt) => {
+  const x = Math.sin(i * 12.9898 + salt * 78.233) * 43758.5453;
+  return x - Math.floor(x);
+};
+const stalks = Array.from({ length: 46 }, (_, i) => {
+  const flower = i % 4 === 1;
+  const h = flower ? 110 + rand(i, 1) * 70 : 46 + rand(i, 2) * 78;
+  const lean = (rand(i, 3) - 0.5) * 34;        // how far the tip curls over
+  const w = flower ? 2.4 + rand(i, 9) * 0.8 : 3 + rand(i, 4) * 3.4;
+  return {
+    flower,
+    h,
+    w,
+    lean,
+    x: (i / 45) * 100 + (rand(i, 5) - 0.5) * 2.6,
+    dur: 4 + rand(i, 6) * 4,
+    delay: -rand(i, 7) * 6,
+    depth: rand(i, 8),                          // 0 = far/pale, 1 = near/dark
+    petals: 5 + Math.floor(rand(i, 10) * 3),
+    bloomSize: 22 + rand(i, 11) * 16,
+    hue: Math.floor(rand(i, 12) * 3),
+  };
+});
+
+---
+<section class="section countdown">
+  <div class="wrap" style="text-align:center">
+    <p class="eyebrow" data-reveal>Counting the days</p>
+    <div class="clock" data-countdown={couple.date} data-stagger="90">
+      {units.map((u) => (
+        <div class="clock__cell" data-reveal="down">
+          <span class="clock__value" data-unit={u}>00</span>
+          <span class="clock__label">{u}</span>
+        </div>
+      ))}
+    </div>
+    <p class="countdown__note" data-reveal style="--reveal-delay:520ms">{couple.hashtag}</p>
+  </div>
+  <div class="meadow" aria-hidden="true">
+    {stalks.map((s, i) => (
+      <span
+        class={`stalk ${s.flower ? 'stalk--flower' : ''}`}
+        style={`--x:${s.x.toFixed(2)}%; --h:${s.h.toFixed(0)}px; --w:${s.w.toFixed(1)}px; --lean:${s.lean.toFixed(1)}; --dur:${s.dur.toFixed(2)}s; --delay:${s.delay.toFixed(2)}s; --depth:${s.depth.toFixed(2)};`}
+      >
+        <svg class="stalk__svg" viewBox="0 0 40 100" preserveAspectRatio="none">
+          {/* Tapered blade: a quadratic curve out and a mirrored one back,
+              so the shape narrows from a wide base to a fine tip. */}
+          <path
+            d={`M ${20 - s.w / 2} 100 Q ${20 + s.lean * 0.35} 55 ${20 + s.lean} 2 Q ${20 + s.lean * 0.35 + s.w * 0.9} 55 ${20 + s.w / 2} 100 Z`}
+          />
+        </svg>
+        {s.flower && (
+          <span class="bloom" style={`--size:${s.bloomSize.toFixed(0)}px; --tipx:${s.lean.toFixed(1)}; --hue:${s.hue};`}>
+            <svg viewBox="0 0 100 100">
+              {Array.from({ length: s.petals }).map((__, p) => (
+                <ellipse
+                  class="petal"
+                  cx="50"
+                  cy="27"
+                  rx="14"
+                  ry="23"
+                  transform={`rotate(${(p * 360) / s.petals + rand(i, p) * 8} 50 50)`}
+                />
+              ))}
+              <circle class="bloom__eye" cx="50" cy="50" r="10" />
+            </svg>
+          </span>
+        )}
+      </span>
+    ))}
+  </div>
+</section>
+
+<style>
+  .countdown {
+    position: relative;
+    overflow: hidden;
+    background: var(--ivory-deep);
+    border-block: var(--rule);
+    padding-bottom: clamp(7rem, 14vh, 12rem);
+  }
+
+  /* --- CSS meadow: curved SVG blades that sway, with layered blooms --- */
+  .meadow {
+    position: absolute;
+    inset: auto 0 0;
+    height: 200px;
+    pointer-events: none;
+  }
+  /* soft earth haze so the stems root into something */
+  .meadow::after {
+    content: "";
+    position: absolute;
+    inset: auto 0 0;
+    height: 46px;
+    background: linear-gradient(to top, rgba(138, 154, 131, 0.22), transparent);
+  }
+  .stalk {
+    position: absolute;
+    bottom: -2px;
+    left: var(--x);
+    width: 40px;
+    height: var(--h);
+    margin-left: -20px;
+    transform-origin: 50% 100%;
+    animation: sway var(--dur) var(--delay) ease-in-out infinite alternate;
+    /* far blades sit paler and slightly smaller — cheap depth */
+    opacity: calc(0.4 + var(--depth) * 0.55);
+  }
+  .stalk__svg {
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+    fill: color-mix(in srgb, var(--sage) calc(45% + var(--depth) * 55%), var(--ivory-deep));
+  }
+  .stalk--flower .stalk__svg { fill: var(--sage); }
+
+  .bloom {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    width: var(--size);
+    height: var(--size);
+    /* park the head on the curved tip of its own stem */
+    translate: calc(-50% + var(--tipx) * 1px) -55%;
+    animation: bloom-in 1.1s var(--ease-out-expo) both;
+    animation-delay: calc(var(--delay) * -0.4);
+  }
+  .bloom svg { width: 100%; height: 100%; overflow: visible; }
+  .petal {
+    fill: var(--blush);
+    opacity: 0.95;
+  }
+  .bloom[style*="--hue:1"] .petal { fill: #fdf6f1; }
+  .bloom[style*="--hue:2"] .petal { fill: var(--gold-light); }
+  .bloom__eye { fill: var(--gold); }
+
+  @keyframes sway {
+    from { transform: rotate(-5deg) skewX(2deg); }
+    to   { transform: rotate(5deg) skewX(-2deg); }
+  }
+  @keyframes bloom-in {
+    from { scale: 0; rotate: -50deg; opacity: 0; }
+    to   { scale: 1; rotate: 0deg; opacity: 1; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .stalk, .bloom { animation: none; }
+  }
+  .clock {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: clamp(0.5rem, 3vw, 3rem);
+    max-width: 860px;
+    margin: 2rem auto 0;
+  }
+  .clock__cell {
+    display: grid;
+    gap: 0.6rem;
+    padding-inline: 0.25rem;
+    border-left: var(--rule);
+  }
+  .clock__cell:first-child { border-left: 0; }
+  .clock__value {
+    font-family: var(--font-display);
+    font-size: clamp(2.4rem, 8vw, 5rem);
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+  }
+  .clock__label {
+    font-size: 0.6rem;
+    letter-spacing: 0.35em;
+    text-transform: uppercase;
+    color: var(--gold);
+  }
+  .countdown__note {
+    margin: 3rem 0 0;
+    font-size: 0.72rem;
+    letter-spacing: 0.35em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+  }
+</style>
