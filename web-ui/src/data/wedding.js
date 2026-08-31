@@ -2,7 +2,7 @@ const U = (id, w, h) =>
   `https://images.unsplash.com/${id}?auto=format&fit=crop&w=${w}&h=${h}&q=80`;
 
 export const couple = {
-  bride: 'Aradhana',
+  bride: 'Tharu',
   groom: 'Sithika',
   hashtag: '#AradhanaWedsSithika',
   date: '2026-12-12T16:30:00+05:30',
