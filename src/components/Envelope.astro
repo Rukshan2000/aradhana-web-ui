@@ -343,6 +343,35 @@ import { couple, guest } from '../data/wedding.js';
   html.envelope-lock,
   html.envelope-lock body { overflow: hidden; height: 100%; }
 
+  /* ── small screens ─────────────────────────────────────────
+     The card's height is a fraction of the envelope's WIDTH (3:2), so
+     on a narrow phone there is far less room for the same six lines of
+     type. Widen the envelope and tighten every vertical gap so the
+     addressed block, the names and the date all still fit inside. */
+  @media (max-width: 620px) {
+    .envelope { gap: clamp(1.25rem, 3.5vh, 2rem); padding: 1.5rem 0.9rem; }
+    .envelope__stage { width: min(560px, 93vw); }
+
+    .card__inner { padding: 6% 5%; outline-offset: -4%; }
+
+    .card__to { margin-bottom: 4%; padding-bottom: 3.5%; gap: 0.1em; }
+    .card__to-label { font-size: 0.44rem; letter-spacing: 0.3em; }
+    .card__to-name { font-size: clamp(0.95rem, 4.6vw, 1.35rem); }
+
+    .card__eyebrow { font-size: 0.5rem; letter-spacing: 0.3em; margin-bottom: 0.5rem; }
+    .card__names { font-size: clamp(1.45rem, 7.4vw, 2.2rem); }
+    .card__rule { margin: 0.6rem auto; }
+    .card__meta { font-size: 0.5rem; letter-spacing: 0.18em; }
+    .card__meta--city { margin-top: 0.3rem; }
+  }
+
+  /* Landscape phones and short windows: the object plus the button and
+     hint have to share very little height. */
+  @media (max-height: 620px) {
+    .envelope__stage { width: min(460px, 78vw); }
+    .envelope { gap: 1rem; }
+  }
+
   @media (prefers-reduced-motion: reduce) {
     .envelope { transition: opacity 0.4s linear, visibility 0.4s; }
     .paper { cursor: pointer; }
