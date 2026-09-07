@@ -1,0 +1,14 @@
+---
+/* Shown for an unknown wedding or invitee slug. Deliberately vague: the URL
+   is the only credential an invitation has, so it gives nothing away. */
+import Base from '../layouts/Base.astro';
+---
+<Base title="Invitation not found" description="This invitation link is not valid.">
+  <main style="min-height:100vh;display:grid;place-items:center;text-align:center;padding:2rem">
+    <div>
+      <p style="font-size:2rem;margin:0 0 .5rem">✦</p>
+      <h1 style="margin:0 0 .5rem">This invitation link isn’t valid</h1>
+      <p style="opacity:.7;margin:0">Please check the link you were sent, or ask the couple for a new one.</p>
+    </div>
+  </main>
+</Base>

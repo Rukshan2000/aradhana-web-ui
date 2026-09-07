@@ -1,0 +1,30 @@
+---
+/* /go/<weddingSlug> — the permanent target for a QR code on a card that
+   carries no invitee, i.e. the open invitation. The slug printed here may be
+   an old one; the API resolves it through the alias table and answers with
+   the address the open link lives at today. */
+import Base from '../../layouts/Base.astro';
+import QrLanding from '../../components/QrLanding.astro';
+import { fetchInviteTarget, trackOpen, REVOKED } from '../../lib/api.js';
+
+export const prerender = false;
+
+const { wedding: weddingSlug } = Astro.params;
+
+let data = null;
+try {
+  data = await fetchInviteTarget(weddingSlug, null);
+} catch (err) {
+  console.error('qr resolve failed:', err.message);
+  return new Response('Invitation temporarily unavailable', { status: 503 });
+}
+if (!data) return Astro.rewrite('/404');
+if (data === REVOKED) return Astro.rewrite('/expired');
+
+const names = data.bride && data.groom ? `${data.bride} & ${data.groom}` : 'You are invited';
+
+await trackOpen({ weddingSlug: data.wedding_slug, url: Astro.url.pathname, request: Astro.request });
+---
+<Base title={names} description="Open your wedding invitation." wedding={data.wedding_slug}>
+  <QrLanding target={data.path} couple={data} />
+</Base>

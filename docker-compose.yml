@@ -1,0 +1,124 @@
+# Kwings guestbook — three services behind the host's existing nginx.
+#
+# Ports were chosen against `docker ps` / `ss -tlnp` on 164.68.97.187:
+# 3000-3009 and 4000-4004 are already taken by other projects, so this stack
+# claims 3010 / 3011 / 4005.
+#
+# All three publish on 127.0.0.1 only. nginx runs on the host and terminates
+# TLS, so nothing here needs to be reachable from the internet directly —
+# that keeps portal-api's public endpoints (/api/track, the open RSVP) behind
+# the same proxy as everything else instead of exposed on a raw port.
+#
+# Postgres and MinIO already run on the host, not in this stack; the API
+# reaches them over host.docker.internal.
+
+name: kwings-guestbook
+
+services:
+  portal-api:
+    build:
+      context: ./portal-api
+    image: kwings-guestbook-api
+    container_name: kwings-guestbook-api
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:4005:4000"
+    environment:
+      NODE_ENV: production
+      PORT: 4000
+
+      # Host Postgres. pg_hba.conf on the server already permits
+      # 172.16.0.0/12 (the Docker bridge range) with scram-sha-256.
+      DB_HOST: host.docker.internal
+      DB_PORT: 5432
+      DB_NAME: ${DB_NAME:-kwings-wedding-invitation}
+      DB_USER: ${DB_USER:-kwings_wedding}
+      DB_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD must be set in .env}
+
+      # Required — the API refuses to start without it.
+      JWT_SECRET: ${JWT_SECRET:?JWT_SECRET must be set in .env}
+
+      # Locks CORS to the portal instead of reflecting any origin.
+      PORTAL_ORIGIN: ${PORTAL_ORIGIN:-https://guestbookportal.kwingsmedia.com}
+
+      S3_ENDPOINT: ${S3_ENDPOINT:-https://minio.kwingsmedia.com}
+      S3_REGION: ${S3_REGION:-us-east-1}
+      S3_BUCKET: ${S3_BUCKET:-kwings-wedding-invitation}
+      S3_PUBLIC_URL: ${S3_PUBLIC_URL:-https://minio.kwingsmedia.com/kwings-wedding-invitation}
+      S3_ACCESS_KEY: ${S3_ACCESS_KEY:?S3_ACCESS_KEY must be set in .env}
+      S3_SECRET_KEY: ${S3_SECRET_KEY:?S3_SECRET_KEY must be set in .env}
+
+      # Sign-in codes and password resets. Optional: without them the API
+      # starts fine and only those two endpoints answer 503.
+      SMTP_HOST: ${SMTP_HOST:-}
+      SMTP_PORT: ${SMTP_PORT:-587}
+      SMTP_USER: ${SMTP_USER:-}
+      SMTP_PASSWORD: ${SMTP_PASSWORD:-}
+      SMTP_FROM_NAME: ${SMTP_FROM_NAME:-Guest Book}
+      SMTP_FROM_EMAIL: ${SMTP_FROM_EMAIL:-}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    networks:
+      - guestbook
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:4000/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+
+  web-ui:
+    build:
+      context: ./web-ui
+    image: kwings-guestbook-web
+    container_name: kwings-guestbook-web
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:3010:4321"
+    environment:
+      NODE_ENV: production
+      HOST: 0.0.0.0
+      PORT: 4321
+      # Server-side only: the public site calls the API over this compose
+      # network, so the API's address never reaches a visitor's browser.
+      API_BASE: http://portal-api:4000
+      # Reaches the browser, unlike API_BASE: it is only ever a link href on
+      # the landing page at `/`, which sends couples to the portal to sign in.
+      PORTAL_BASE: ${PORTAL_ORIGIN:-https://guestbookportal.kwingsmedia.com}
+    depends_on:
+      portal-api:
+        condition: service_healthy
+    networks:
+      - guestbook
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:4321/').then(r=>process.exit(r.status<500?0:1)).catch(()=>process.exit(1))"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+
+  portal-app:
+    build:
+      context: ./portal-app
+      args:
+        # Vite inlines these at build time — changing either requires
+        # `docker compose build portal-app`, not just a restart.
+        VITE_API_BASE: ${VITE_API_BASE:-https://guestbookapi.kwingsmedia.com}
+        VITE_SITE_BASE: ${VITE_SITE_BASE:-https://guestbook.kwingsmedia.com}
+    image: kwings-guestbook-portal
+    container_name: kwings-guestbook-portal
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:3011:80"
+    networks:
+      - guestbook
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1/"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+networks:
+  guestbook:
+    driver: bridge

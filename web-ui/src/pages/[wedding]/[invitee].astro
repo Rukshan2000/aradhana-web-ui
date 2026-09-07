@@ -1,0 +1,39 @@
+---
+/* The personalised invitation: /<weddingSlug>/<inviteeSlug>.
+   Both halves are looked up in portal-api on every request, so a wedding
+   created in the portal is reachable immediately without a rebuild. An
+   unknown wedding or invitee 404s. */
+import Invite from '../../layouts/Invite.astro';
+import { fetchInvite, trackOpen, toCouple, mergeContent, REVOKED } from '../../lib/api.js';
+import defaultContent, { couple as defaultCouple, rsvp as defaultRsvp } from '../../data/wedding.js';
+
+export const prerender = false;
+
+const { wedding: weddingSlug, invitee: inviteeSlug } = Astro.params;
+
+let data = null;
+try {
+  data = await fetchInvite(weddingSlug, inviteeSlug);
+} catch (err) {
+  // The API being down should read as "unavailable", not as a missing guest.
+  console.error('invite lookup failed:', err.message);
+  return new Response('Invitation temporarily unavailable', { status: 503 });
+}
+if (!data) return Astro.rewrite('/404');
+// A withdrawn invitation gets the designed "envelope sealed" page rather
+// than being told it never existed.
+if (data === REVOKED) return Astro.rewrite('/expired');
+
+const { wedding, guest } = data;
+const couple = toCouple(wedding, defaultCouple);
+const content = mergeContent(wedding.content, defaultContent);
+
+// Record the open. Awaited so it is not cut off when the response ends.
+await trackOpen({
+  weddingSlug,
+  slug: inviteeSlug,
+  url: Astro.url.pathname,
+  request: Astro.request,
+});
+---
+<Invite guest={guest} couple={couple} content={content} replyBy={wedding.reply_by || defaultRsvp.replyBy} weddingSlug={weddingSlug} />

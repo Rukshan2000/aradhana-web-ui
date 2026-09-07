@@ -1,0 +1,30 @@
+{
+  "name": "kwings-wedding-invitation-api",
+  "version": "1.0.0",
+  "description": "Backend API for the Kwings wedding invitation (guests, RSVP, image uploads, invitation tracking).",
+  "type": "module",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js",
+    "tunnel": "bash scripts/tunnel.sh",
+    "migrate": "knex migrate:latest",
+    "migrate:rollback": "knex migrate:rollback",
+    "migrate:make": "knex migrate:make",
+    "seed": "node scripts/seed.js"
+  },
+  "dependencies": {
+    "@aws-sdk/client-s3": "^3.658.0",
+    "bcryptjs": "^3.0.3",
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.0",
+    "jsonwebtoken": "^9.0.3",
+    "knex": "^3.1.0",
+    "multer": "^2.3.0",
+    "nanoid": "^5.0.7",
+    "nodemailer": "^10.0.0",
+    "pg": "^8.13.0"
+  }
+}

@@ -1,0 +1,17 @@
+---
+/* A sample invitation, rendered entirely from the built-in fallback content
+   in src/data/wedding.json — no wedding row, no database, nothing to set up.
+   It exists so someone deciding whether to build a site can see a finished
+   one first, and so the portal has something concrete to link to.
+
+   This is what `/` used to render. The bare root now redirects to the portal
+   (there is no wedding slug there, so there is nothing real to show), which
+   left the sample with no address of its own until this page.
+
+   A static route wins over the `[wedding]` dynamic one in Astro, so this
+   never shadows a real wedding unless a couple's slug is literally "demo". */
+import Invite from '../layouts/Invite.astro';
+
+export const prerender = false;
+---
+<Invite />

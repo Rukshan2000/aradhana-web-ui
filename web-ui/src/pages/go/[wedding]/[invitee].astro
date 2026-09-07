@@ -1,0 +1,40 @@
+---
+/* /go/<weddingSlug>/<inviteeSlug> — the permanent target for a personalised
+   card's QR code. Both slugs are read as printed and resolved against the
+   live rows, so the button always carries the invitation's current URL even
+   after the couple has renamed either segment. */
+import Base from '../../../layouts/Base.astro';
+import QrLanding from '../../../components/QrLanding.astro';
+import { fetchInviteTarget, trackOpen, REVOKED } from '../../../lib/api.js';
+
+export const prerender = false;
+
+const { wedding: weddingSlug, invitee: inviteeSlug } = Astro.params;
+
+let data = null;
+try {
+  data = await fetchInviteTarget(weddingSlug, inviteeSlug);
+} catch (err) {
+  console.error('qr resolve failed:', err.message);
+  return new Response('Invitation temporarily unavailable', { status: 503 });
+}
+if (!data) return Astro.rewrite('/404');
+if (data === REVOKED) return Astro.rewrite('/expired');
+
+const names = data.bride && data.groom ? `${data.bride} & ${data.groom}` : 'You are invited';
+
+await trackOpen({
+  weddingSlug: data.wedding_slug,
+  slug: data.invitee_slug,
+  url: Astro.url.pathname,
+  request: Astro.request,
+});
+---
+<Base
+  title={names}
+  description="Open your wedding invitation."
+  wedding={data.wedding_slug}
+  invitee={data.invitee_slug}
+>
+  <QrLanding target={data.path} name={data.name} couple={data} />
+</Base>

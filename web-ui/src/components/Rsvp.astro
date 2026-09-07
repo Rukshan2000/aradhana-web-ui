@@ -1,0 +1,450 @@
+---
+import { couple as defaultCouple, guest as fallbackGuest, rsvp, headings as defaultHeadings } from '../data/wedding.js';
+/* `openRsvp` is the shareable /<weddingSlug> link, where no guest row exists
+   yet: nobody is named, and the form collects who they are, how many are
+   coming and a phone number so the couple can reach them. */
+const { guest = fallbackGuest, couple = defaultCouple, replyBy, weddingSlug, openRsvp = false, closed = false, heading = defaultHeadings.rsvp } = Astro.props;
+const rsvpBy = replyBy || rsvp.replyBy;
+const MAX_SEATS = 10;
+
+// Same "Add to Google Calendar" template link as Details.astro, built here
+// too so the post-RSVP popup can offer it without that section's props.
+const HOURS = 5;
+const stamp = (d: Date) => d.toISOString().replace(/[-:]|\.\d{3}/g, '');
+const calendarUrl = (() => {
+  const start = new Date(couple.date);
+  if (Number.isNaN(start.getTime())) return null;
+  const end = new Date(start.getTime() + HOURS * 60 * 60 * 1000);
+  const where = [couple.venue, couple.city].filter(Boolean).join(', ');
+  const params = new URLSearchParams({
+    action: 'TEMPLATE',
+    text: `The wedding of ${couple.bride} & ${couple.groom}`,
+    dates: `${stamp(start)}/${stamp(end)}`,
+    details: `We would love to have you with us. ${couple.hashtag || ''}`.trim(),
+    location: where,
+  });
+  return `https://calendar.google.com/calendar/render?${params.toString()}`;
+})();
+---
+<section class="section rsvp" id="rsvp">
+  <div class="narrow" style="text-align:center">
+    <p class="eyebrow" data-reveal>{heading.eyebrow}</p>
+    <h2 data-split>{heading.title}</h2>
+    <p class="rsvp__lede" data-reveal style="--reveal-delay:200ms">
+      {openRsvp
+        ? `Kindly reply by ${rsvpBy} with your name and how many will be joining, so we can save you a seat — and a slice of cake.`
+        : `${guest.name}, kindly reply by ${rsvpBy} so we can save your family a seat — and a slice of cake.`}
+    </p>
+
+    {closed ? (
+      <p class="rsvp__lede" data-reveal style="--reveal-delay:300ms">
+        Replies are now closed — please contact {couple.bride} or {couple.groom} directly.
+      </p>
+    ) : (
+    <form class="form" data-rsvp data-rsvp-open={openRsvp ? '' : undefined} data-stagger="80" novalidate>
+      <input type="hidden" name="weddingSlug" value={weddingSlug} />
+      <input type="hidden" name="guestSlug" value={guest.slug} />
+      <label class="field field--full" data-reveal="left">
+        <span>Full name</span>
+        <input
+          type="text"
+          name="name"
+          required
+          autocomplete="name"
+          placeholder="Your name"
+          value={openRsvp ? '' : `${guest.name} ${guest.household}`}
+        />
+      </label>
+
+      {openRsvp && (
+        <label class="field" data-reveal="left">
+          <span>Phone number</span>
+          <input
+            type="tel"
+            name="phone"
+            required
+            autocomplete="tel"
+            inputmode="tel"
+            placeholder="07X XXX XXXX"
+          />
+        </label>
+      )}
+
+      {openRsvp && (
+        <fieldset class="field field--full choice" data-reveal>
+          <legend>Whose side are you joining from?</legend>
+          <div class="choice__options">
+            <label class="choice__option">
+              <input type="radio" name="side" value="bride" required />
+              <span class="choice__box">
+                <span class="choice__mark" aria-hidden="true"></span>
+                <span class="choice__text">
+                  <strong>{couple.bride}'s side</strong>
+                  <em>Bride's family &amp; friends</em>
+                </span>
+              </span>
+            </label>
+
+            <label class="choice__option">
+              <input type="radio" name="side" value="groom" />
+              <span class="choice__box">
+                <span class="choice__mark" aria-hidden="true"></span>
+                <span class="choice__text">
+                  <strong>{couple.groom}'s side</strong>
+                  <em>Groom's family &amp; friends</em>
+                </span>
+              </span>
+            </label>
+          </div>
+        </fieldset>
+      )}
+
+      {openRsvp && (
+        <label class="field" data-reveal="right">
+          <span>How many attending</span>
+          <input
+            type="number"
+            name="attending_count"
+            required
+            min="1"
+            max={MAX_SEATS}
+            step="1"
+            value="1"
+            inputmode="numeric"
+          />
+        </label>
+      )}
+
+      <fieldset class="field field--full choice" data-reveal="right">
+        <legend>Will you attend?</legend>
+        <div class="choice__options">
+          <label class="choice__option">
+            <input type="radio" name="attending" value="yes" required checked />
+            <span class="choice__box">
+              <span class="choice__mark" aria-hidden="true"></span>
+              <span class="choice__text">
+                <strong>Joyfully accepts</strong>
+                <em>We will be there</em>
+              </span>
+            </span>
+          </label>
+
+          <label class="choice__option">
+            <input type="radio" name="attending" value="no" />
+            <span class="choice__box">
+              <span class="choice__mark" aria-hidden="true"></span>
+              <span class="choice__text">
+                <strong>Regretfully declines</strong>
+                <em>We cannot make it</em>
+              </span>
+            </span>
+          </label>
+        </div>
+      </fieldset>
+
+      <label class="field field--full" data-reveal>
+        <span>A note for the couple</span>
+        <textarea name="note" rows="3" placeholder="Dietary needs, a song request, a blessing…"></textarea>
+      </label>
+
+      <div class="field field--full" data-reveal>
+        <button type="submit">Send RSVP with love</button>
+      </div>
+
+      <p class="rsvp__thanks" data-rsvp-note hidden>
+        Thank you — your reply is noted. {couple.bride} and {couple.groom} cannot wait to see you.
+      </p>
+      <p class="rsvp__error" data-rsvp-error hidden>
+        Something went wrong sending your reply — please try again in a moment.
+      </p>
+    </form>
+    )}
+  </div>
+
+  <!-- Post-RSVP popup: confirms the reply and, when they're coming,
+       offers to drop the date straight into Google Calendar. -->
+  <div class="rsvp-popup" data-rsvp-popup hidden>
+    <div class="rsvp-popup__backdrop" data-rsvp-popup-close></div>
+    <div class="rsvp-popup__card" role="dialog" aria-modal="true" aria-labelledby="rsvp-popup-title">
+      <button type="button" class="rsvp-popup__close" data-rsvp-popup-close aria-label="Close">&times;</button>
+      <p class="rsvp-popup__eyebrow">With so much love</p>
+      <h3 id="rsvp-popup-title" class="rsvp-popup__title" data-rsvp-popup-title>Thank you</h3>
+      <p class="rsvp-popup__text" data-rsvp-popup-text>
+        {couple.bride} and {couple.groom} cannot wait to see you.
+      </p>
+      {calendarUrl && (
+        <a class="rsvp-popup__calendar" data-rsvp-popup-calendar href={calendarUrl} target="_blank" rel="noreferrer noopener">
+          <svg class="rsvp-popup__calendar-icon" viewBox="0 0 24 24" aria-hidden="true">
+            <rect x="3" y="5" width="18" height="16" rx="2" />
+            <path d="M3 10h18M8 3v4M16 3v4M12 13v5M9.5 15.5h5" />
+          </svg>
+          <span>Add to Google Calendar</span>
+        </a>
+      )}
+    </div>
+  </div>
+</section>
+
+<style>
+  .rsvp { background: var(--ivory-deep); border-top: var(--rule); }
+  .rsvp h2 { font-size: clamp(2rem, 5vw, 3.4rem); margin-bottom: 1.2rem; }
+  .rsvp__lede { color: var(--ink-soft); max-width: 32em; margin-inline: auto; }
+
+  .form {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1.4rem;
+    margin-top: 3rem;
+    text-align: left;
+  }
+  .field--full { grid-column: 1 / -1; }
+
+  /* ── Attendance: two visible cards, not a hidden dropdown ───── */
+  .choice { border: 0; padding: 0; margin: 0; }
+  .choice legend {
+    padding: 0;
+    margin-bottom: 0.55rem;
+    font-size: 0.62rem;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+  }
+  .choice__options {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr));
+    gap: 0.9rem;
+  }
+  .choice__option { cursor: pointer; }
+  .choice__option input {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+  .choice__box {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    height: 100%;
+    padding: 1rem 1.15rem;
+    border: 1px solid rgba(176, 141, 79, 0.35);
+    background: var(--ivory);
+    transition: border-color 0.35s ease, background 0.35s ease, box-shadow 0.35s ease;
+  }
+  .choice__mark {
+    position: relative;
+    flex: none;
+    width: 16px;
+    height: 16px;
+    border: 1px solid var(--gold);
+    border-radius: 50%;
+  }
+  .choice__mark::after {
+    content: "";
+    position: absolute;
+    inset: 3px;
+    border-radius: 50%;
+    background: var(--gold);
+    transform: scale(0);
+    transition: transform 0.35s var(--ease-out-expo);
+  }
+  .choice__text { display: grid; gap: 0.1rem; line-height: 1.35; }
+  .choice__text strong { font-weight: 400; font-size: 0.95rem; }
+  .choice__text em {
+    font-style: normal;
+    font-size: 0.72rem;
+    letter-spacing: 0.06em;
+    color: var(--ink-soft);
+  }
+
+  .choice__option:hover .choice__box { border-color: var(--gold); }
+  .choice__option input:focus-visible + .choice__box {
+    outline: 1px solid var(--gold);
+    outline-offset: 3px;
+  }
+  .choice__option input:checked + .choice__box {
+    border-color: var(--gold);
+    background: color-mix(in srgb, var(--gold) 8%, var(--ivory));
+    box-shadow: 0 14px 30px -24px rgba(0, 0, 0, 0.7);
+  }
+  .choice__option input:checked + .choice__box .choice__mark::after { transform: scale(1); }
+
+  @media (prefers-reduced-motion: reduce) {
+    .choice__box, .choice__mark::after { transition-duration: 0.01ms; }
+  }
+  .field { display: grid; gap: 0.55rem; }
+  .field > span {
+    font-size: 0.62rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--gold);
+  }
+  input, select, textarea, button {
+    font: inherit;
+    color: inherit;
+    width: 100%;
+    padding: 0.85rem 0;
+    background: transparent;
+    border: 0;
+    border-bottom: var(--rule);
+    border-radius: 0;
+    transition: border-color 0.4s var(--ease-out-expo);
+  }
+  textarea { resize: vertical; }
+  input:focus, select:focus, textarea:focus { outline: 0; border-bottom-color: var(--gold); }
+  input::placeholder, textarea::placeholder { color: rgba(93, 83, 71, 0.45); }
+
+  button {
+    justify-self: start;
+    width: auto;
+    min-width: 15rem;
+    margin-top: 1rem;
+    padding: 1.05rem 2.5rem;
+    border: 1px solid var(--gold);
+    background: transparent;
+    font-size: 0.68rem;
+    letter-spacing: 0.34em;
+    text-transform: uppercase;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    z-index: 0;
+  }
+  button::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: var(--gold);
+    transform: scaleX(0);
+    transform-origin: 0 50%;
+    transition: transform 0.65s var(--ease-out-expo);
+  }
+  button:hover:not(:disabled) { color: var(--ivory); }
+  button:hover:not(:disabled)::before { transform: scaleX(1); }
+  button:disabled { opacity: 0.45; cursor: default; }
+
+  .rsvp__thanks {
+    grid-column: 1 / -1;
+    margin: 0;
+    padding: 1.25rem 0 0;
+    border-top: var(--rule);
+    font-family: var(--font-display);
+    font-style: italic;
+    font-size: 1.3rem;
+    color: var(--gold);
+  }
+  .rsvp__error {
+    grid-column: 1 / -1;
+    margin: 0;
+    padding: 1.25rem 0 0;
+    border-top: var(--rule);
+    font-size: 0.9rem;
+    color: #a33;
+  }
+
+  @media (max-width: 620px) {
+    .form { grid-template-columns: 1fr; }
+    button { width: 100%; }
+  }
+
+  /* ── post-RSVP popup ─────────────────────────────────────────── */
+  .rsvp-popup {
+    position: fixed;
+    inset: 0;
+    z-index: 300;
+    display: grid;
+    place-items: center;
+    padding: 1.5rem;
+  }
+  .rsvp-popup[hidden] { display: none; }
+  .rsvp-popup__backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(34, 29, 23, 0.55);
+    backdrop-filter: blur(2px);
+    opacity: 0;
+  }
+  .rsvp-popup__card {
+    position: relative;
+    width: min(420px, 100%);
+    padding: clamp(2rem, 5vw, 2.75rem) clamp(1.75rem, 5vw, 2.5rem);
+    background: var(--ivory);
+    border: 1px solid rgba(176, 141, 79, 0.35);
+    box-shadow: 0 30px 70px -20px rgba(34, 29, 23, 0.45);
+    text-align: center;
+    opacity: 0;
+    transform: translateY(18px) scale(0.97);
+  }
+  /* Overrides the generic `button` rules (fixed min-width, sweep fill,
+     bottom rule) further down this file, which this element also matches. */
+  .rsvp-popup__close {
+    position: absolute;
+    top: 0.6rem;
+    right: 0.6rem;
+    z-index: 1;
+    display: grid;
+    place-items: center;
+    width: 2rem;
+    height: 2rem;
+    min-width: 0;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    font-size: 1.4rem;
+    line-height: 1;
+    color: var(--ink-soft);
+    cursor: pointer;
+  }
+  .rsvp-popup__close::before { content: none; }
+  .rsvp-popup__close:hover { color: var(--gold); }
+  .rsvp-popup__eyebrow {
+    margin: 0 0 0.4rem;
+    font-size: 0.62rem;
+    letter-spacing: 0.32em;
+    text-transform: uppercase;
+    color: var(--gold);
+  }
+  .rsvp-popup__title {
+    margin: 0 0 0.75rem;
+    font-family: var(--font-display);
+    font-style: italic;
+    font-weight: 300;
+    font-size: clamp(1.6rem, 5vw, 2.1rem);
+  }
+  .rsvp-popup__text {
+    margin: 0 0 1.5rem;
+    color: var(--ink-soft);
+    line-height: 1.6;
+  }
+  .rsvp-popup__calendar {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    width: auto;
+    padding: 0.85rem 1.8rem;
+    border: 1px solid var(--gold);
+    background: transparent;
+    font-size: 0.66rem;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: inherit;
+    text-decoration: none;
+    transition: background 0.35s ease, color 0.35s ease;
+  }
+  .rsvp-popup__calendar:hover { background: var(--gold); color: var(--ivory); }
+  .rsvp-popup__calendar-icon {
+    width: 18px;
+    height: 18px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.6;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .rsvp-popup__backdrop, .rsvp-popup__card { transition: none; }
+  }
+</style>

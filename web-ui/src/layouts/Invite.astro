@@ -1,0 +1,48 @@
+---
+/* The whole invitation, addressed to one household of one wedding. Both
+   routes render this: `/` with the fallback couple + guest from wedding.json,
+   and `/[wedding]/[invitee]` with the pair loaded from portal-api. */
+import Base from './Base.astro';
+import Envelope from '../components/Envelope.astro';
+import Hero from '../components/Hero.astro';
+import Invitation from '../components/Invitation.astro';
+import Countdown from '../components/Countdown.astro';
+import Story from '../components/Story.astro';
+import Gallery from '../components/Gallery.astro';
+import Details from '../components/Details.astro';
+import Rsvp from '../components/Rsvp.astro';
+import Footer from '../components/Footer.astro';
+import Butterflies from '../components/Butterflies.astro';
+import Music from '../components/Music.astro';
+import defaultContent, { couple as defaultCouple, guest as fallbackGuest, rsvp as defaultRsvp } from '../data/wedding.js';
+
+const {
+  guest = fallbackGuest,
+  couple = defaultCouple,
+  content = defaultContent,
+  replyBy = defaultRsvp.replyBy,
+  weddingSlug,
+  openRsvp = false,
+  rsvpClosed = false,
+} = Astro.props;
+
+const title = `${couple.bride} & ${couple.groom} — ${couple.dateLabel}`;
+const description = guest.slug
+  ? `${guest.name}, you are invited to celebrate the wedding of ${couple.bride} and ${couple.groom} in ${couple.city}.`
+  : `Join ${couple.bride} and ${couple.groom} in ${couple.city} as they celebrate their wedding. Ceremony details, schedule, gallery, and RSVP.`;
+---
+<Base title={title} description={description} wedding={weddingSlug} invitee={guest.slug}>
+  <Envelope guest={guest} couple={couple} openInvite={openRsvp} />
+  <Hero couple={couple} hero={content.hero} heading={content.headings.hero} />
+  <Invitation guest={guest} couple={couple} openInvite={openRsvp} heading={content.headings.invitation} />
+  <Countdown couple={couple} heading={content.headings.countdown} />
+  <Story story={content.story} heading={content.headings.story} weddingYear={new Date(couple.date).getFullYear()} />
+  <Gallery gallery={content.gallery} galleryPool={content.galleryPool} heading={content.headings.gallery} />
+  <Details details={content.details} schedule={content.schedule} venuePhoto={content.venuePhoto}
+    couple={couple} heading={content.headings.details} scheduleHeading={content.headings.schedule} />
+  <Rsvp guest={guest} couple={couple} replyBy={replyBy} weddingSlug={weddingSlug} openRsvp={openRsvp}
+    closed={rsvpClosed} heading={content.headings.rsvp} />
+  <Footer couple={couple} />
+  <Butterflies />
+  <Music music={content.music} />
+</Base>

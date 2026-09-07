@@ -1,0 +1,44 @@
+---
+/* The open invitation: /<weddingSlug>, with no invitee slug.
+   One shareable link for guests the couple has no personalised card for —
+   the same page as /<wedding>/<invitee>, except nobody is named on it and
+   the RSVP form asks the visitor for their name, head count and phone. */
+import Invite from '../../layouts/Invite.astro';
+import { fetchOpenInvite, trackOpen, toCouple, mergeContent, REVOKED } from '../../lib/api.js';
+import defaultContent, { couple as defaultCouple, rsvp as defaultRsvp } from '../../data/wedding.js';
+
+export const prerender = false;
+
+const { wedding: weddingSlug } = Astro.params;
+
+let data = null;
+try {
+  data = await fetchOpenInvite(weddingSlug);
+} catch (err) {
+  // The API being down should read as "unavailable", not as a missing wedding.
+  console.error('open invite lookup failed:', err.message);
+  return new Response('Invitation temporarily unavailable', { status: 503 });
+}
+if (!data) return Astro.rewrite('/404');
+if (data === REVOKED) return Astro.rewrite('/expired');
+
+const { wedding } = data;
+const couple = toCouple(wedding, defaultCouple);
+const content = mergeContent(wedding.content, defaultContent);
+
+// No guest row exists yet — one is created when the form is submitted. The
+// components handle the missing name themselves (see `openInvite`), so there
+// is no placeholder to invent here.
+const guest = { slug: '', name: '', household: '' };
+
+await trackOpen({ weddingSlug, url: Astro.url.pathname, request: Astro.request });
+---
+<Invite
+  guest={guest}
+  couple={couple}
+  content={content}
+  replyBy={wedding.reply_by || defaultRsvp.replyBy}
+  weddingSlug={weddingSlug}
+  openRsvp
+  rsvpClosed={data.open_rsvp === false}
+/>

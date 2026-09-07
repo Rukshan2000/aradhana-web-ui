@@ -1,0 +1,797 @@
+---
+import { couple as defaultCouple, guest as fallbackGuest } from '../data/wedding.js';
+/* See Invitation.astro: the shared link has nobody's name on it. */
+const { guest = fallbackGuest, couple = defaultCouple, openInvite = false } = Astro.props;
+const addressee = openInvite ? 'Invitation for you' : guest.name;
+---
+<div class="envelope" id="envelope" data-envelope>
+  <div class="envelope__veil" aria-hidden="true"></div>
+
+  <!-- Ambient motes: a handful of gold flecks drifting upward, forever,
+       so the empty air around the envelope isn't dead space. Pure CSS,
+       each on its own timing so they never repeat in sync. -->
+  <div class="envelope__motes" aria-hidden="true">
+    <span></span><span></span><span></span><span></span>
+    <span></span><span></span><span></span><span></span>
+  </div>
+
+  <!-- Corner flourishes: pure decoration filling the empty frame around
+       the envelope. Same motif mirrored into all four corners. -->
+  <svg class="envelope__corner envelope__corner--tl" viewBox="0 0 120 120" aria-hidden="true">
+    <path d="M4 60 C4 28 28 4 60 4" />
+    <path d="M4 40 C4 20 20 4 40 4" />
+    <circle cx="4" cy="60" r="2.4" />
+    <circle cx="60" cy="4" r="2.4" />
+  </svg>
+  <svg class="envelope__corner envelope__corner--tr" viewBox="0 0 120 120" aria-hidden="true">
+    <path d="M116 60 C116 28 92 4 60 4" />
+    <path d="M116 40 C116 20 100 4 80 4" />
+    <circle cx="116" cy="60" r="2.4" />
+    <circle cx="60" cy="4" r="2.4" />
+  </svg>
+  <svg class="envelope__corner envelope__corner--bl" viewBox="0 0 120 120" aria-hidden="true">
+    <path d="M4 60 C4 92 28 116 60 116" />
+    <path d="M4 80 C4 100 20 116 40 116" />
+    <circle cx="4" cy="60" r="2.4" />
+    <circle cx="60" cy="116" r="2.4" />
+  </svg>
+  <svg class="envelope__corner envelope__corner--br" viewBox="0 0 120 120" aria-hidden="true">
+    <path d="M116 60 C116 92 92 116 60 116" />
+    <path d="M116 80 C116 100 100 116 80 116" />
+    <circle cx="116" cy="60" r="2.4" />
+    <circle cx="60" cy="116" r="2.4" />
+  </svg>
+
+  <div class="envelope__stage" data-stage>
+    <div class="paper" data-paper>
+      <!-- Back panel: the sheet everything else is folded out of -->
+      <div class="paper__back" aria-hidden="true"></div>
+
+      <!-- The card lives inside the pocket and slides out on open -->
+      <div class="card" data-card>
+        <div class="card__inner">
+          <p class="card__to">
+            {!openInvite && <span class="card__to-label">For</span>}
+            <span class="card__to-name">{addressee}</span>
+            {!openInvite && <span class="card__to-label">{guest.household}</span>}
+          </p>
+          <p class="card__eyebrow">The wedding of</p>
+          <h1 class="card__names">
+            {couple.bride} <em>&amp;</em> {couple.groom}
+          </h1>
+          <div class="card__rule"></div>
+          <p class="card__meta">{couple.dateLabel}</p>
+          <p class="card__meta card__meta--city">{couple.city}</p>
+        </div>
+      </div>
+
+      <!-- Front pocket, cut with the V that a real envelope shows -->
+      <div class="paper__pocket" aria-hidden="true"></div>
+
+      <!-- A hand-written line across the lower pocket, the way a real
+           invitation is finished off with a note in ink. -->
+      <p class="paper__note" aria-hidden="true">with all our love</p>
+
+      <!-- The flap that peels back over the top -->
+      <div class="paper__flap" data-flap aria-hidden="true">
+        <div class="paper__flap-face paper__flap-face--out"></div>
+        <div class="paper__flap-face paper__flap-face--in"></div>
+      </div>
+
+      <!-- Wax seal, cracked in two halves -->
+      <div class="seal" data-seal aria-hidden="true">
+        <div class="seal__half seal__half--l">
+          <div class="seal__wax"><span class="seal__mark"></span></div>
+        </div>
+        <div class="seal__half seal__half--r">
+          <div class="seal__wax"><span class="seal__mark"></span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="envelope__shadow" data-shadow aria-hidden="true"></div>
+  </div>
+
+  <button type="button" class="envelope__button" data-open-invitation>
+    <span>Open Invitation</span>
+  </button>
+  <p class="envelope__hint" data-hint>break the seal</p>
+</div>
+
+<style>
+  .envelope {
+    position: fixed;
+    inset: 0;
+    z-index: 200;
+    display: grid;
+    grid-auto-rows: min-content;
+    align-content: center;
+    justify-items: center;
+    gap: clamp(1.75rem, 5vh, 3rem);
+    background:
+      linear-gradient(180deg, #fdfaf4 0%, #f6efe2 52%, #efe5d3 100%);
+    color: var(--ink);
+    text-align: center;
+    padding: 2rem 1.25rem;
+    overflow: hidden;
+    transition: opacity 0.9s var(--ease-out-expo), visibility 0.9s;
+  }
+  .envelope__veil {
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(78% 62% at 50% 34%, rgba(255, 255, 255, 0.9), transparent 66%),
+      radial-gradient(90% 70% at 50% 44%, rgba(216, 189, 138, 0.22), transparent 68%),
+      radial-gradient(70% 55% at 50% 104%, rgba(150, 122, 78, 0.20), transparent 72%);
+    pointer-events: none;
+  }
+  .envelope::after {
+    content: "";
+    position: absolute;
+    inset: clamp(0.75rem, 3vw, 1.75rem);
+    border: 1px solid rgba(176, 141, 79, 0.28);
+    pointer-events: none;
+  }
+
+  /* ── corner flourishes: decoration for the empty frame ──────── */
+  .envelope__corner {
+    position: absolute;
+    width: clamp(64px, 9vw, 108px);
+    height: clamp(64px, 9vw, 108px);
+    fill: none;
+    stroke: var(--gold);
+    stroke-width: 1;
+    stroke-linecap: round;
+    opacity: 0.55;
+    pointer-events: none;
+    animation: corner-breathe 5.5s ease-in-out infinite;
+  }
+  .envelope__corner circle { fill: var(--gold); stroke: none; opacity: 0.8; }
+  .envelope__corner--tl { top: clamp(1.25rem, 4vw, 2.5rem); left: clamp(1.25rem, 4vw, 2.5rem); }
+  .envelope__corner--tr {
+    top: clamp(1.25rem, 4vw, 2.5rem); right: clamp(1.25rem, 4vw, 2.5rem);
+    transform: scaleX(-1); animation-delay: -1.4s;
+  }
+  .envelope__corner--bl {
+    bottom: clamp(1.25rem, 4vw, 2.5rem); left: clamp(1.25rem, 4vw, 2.5rem);
+    transform: scaleY(-1); animation-delay: -2.8s;
+  }
+  .envelope__corner--br {
+    bottom: clamp(1.25rem, 4vw, 2.5rem); right: clamp(1.25rem, 4vw, 2.5rem);
+    transform: scale(-1, -1); animation-delay: -4.1s;
+  }
+  @keyframes corner-breathe {
+    0%, 100% { opacity: 0.4; }
+    50% { opacity: 0.75; }
+  }
+
+  /* ── ambient motes: drifting gold flecks, continuous ────────── */
+  .envelope__motes {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    pointer-events: none;
+  }
+  .envelope__motes span {
+    position: absolute;
+    bottom: -6%;
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: var(--gold);
+    opacity: 0;
+    animation: mote-rise linear infinite;
+  }
+  .envelope__motes span:nth-child(1) { left: 8%;  width: 3px; height: 3px; animation-duration: 13s; animation-delay: -1s; }
+  .envelope__motes span:nth-child(2) { left: 20%; width: 5px; height: 5px; animation-duration: 17s; animation-delay: -6s; }
+  .envelope__motes span:nth-child(3) { left: 34%; width: 2.5px; height: 2.5px; animation-duration: 11s; animation-delay: -3s; }
+  .envelope__motes span:nth-child(4) { left: 50%; width: 4px; height: 4px; animation-duration: 19s; animation-delay: -9s; }
+  .envelope__motes span:nth-child(5) { left: 64%; width: 3px; height: 3px; animation-duration: 14s; animation-delay: -4.5s; }
+  .envelope__motes span:nth-child(6) { left: 78%; width: 5px; height: 5px; animation-duration: 21s; animation-delay: -12s; }
+  .envelope__motes span:nth-child(7) { left: 90%; width: 3px; height: 3px; animation-duration: 15.5s; animation-delay: -7s; }
+  .envelope__motes span:nth-child(8) { left: 96%; width: 4px; height: 4px; animation-duration: 18s; animation-delay: -2s; }
+  @keyframes mote-rise {
+    0% { transform: translate(0, 0); opacity: 0; }
+    8% { opacity: 0.55; }
+    50% { transform: translate(14px, -52vh); }
+    92% { opacity: 0.35; }
+    100% { transform: translate(-10px, -108vh); opacity: 0; }
+  }
+
+  /* ── the physical object ───────────────────────────────────── */
+  .envelope__stage {
+    position: relative;
+    perspective: 1050px;
+    perspective-origin: 50% 30%;
+    width: min(560px, 84vw);
+  }
+
+  .paper {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 3 / 2;
+    transform-style: preserve-3d;
+    will-change: transform;
+    cursor: pointer;
+  }
+
+  .paper__back,
+  .paper__pocket,
+  .paper__flap-face {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(155deg, #f3ead8 0%, #e6d8bd 58%, #d3c09f 100%);
+  }
+  /* Paper tooth: the noise tile sits on top at low opacity, desaturated,
+     so it grains the surface instead of colouring it. */
+  .paper__back::before,
+  .paper__pocket::before,
+  .paper__flap-face::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: url('/gallery/noise.png') repeat;
+    background-size: 180px;
+    filter: grayscale(1) contrast(0.6);
+    opacity: 0.09;
+    mix-blend-mode: multiply;
+    pointer-events: none;
+    clip-path: inherit;
+  }
+
+  .paper__back {
+    border-radius: 3px;
+    box-shadow:
+      inset 0 0 60px rgba(120, 96, 60, 0.20),
+      0 26px 50px -18px rgba(95, 74, 40, 0.38);
+  }
+
+  /* Front pocket: two folded side panels leaving a V at the top */
+  .paper__pocket {
+    transform: translateZ(14px);
+    clip-path: polygon(0 0, 50% 46%, 100% 0, 100% 100%, 0 100%);
+    border-radius: 0 0 3px 3px;
+    background: linear-gradient(170deg, #efe4d0 0%, #dfd0b2 60%, #cdb897 100%);
+    filter: drop-shadow(0 -3px 6px rgba(70, 52, 28, 0.22));
+  }
+  /* the seams where the side panels fold over */
+  .paper__pocket::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(to bottom right, rgba(255,255,255,0.35), transparent 52%),
+      linear-gradient(to bottom left, rgba(120, 96, 58, 0.16), transparent 52%);
+    clip-path: inherit;
+  }
+
+  /* a hand-written line, inked straight onto the pocket */
+  .paper__note {
+    position: absolute;
+    left: 50%;
+    bottom: 9%;
+    translate: -50% 0;
+    transform: translateZ(15px) rotate(-2.5deg);
+    margin: 0;
+    font-family: var(--font-script);
+    font-size: clamp(1.1rem, 3.4vw, 1.6rem);
+    line-height: 1;
+    color: rgba(90, 68, 38, 0.62);
+    white-space: nowrap;
+    pointer-events: none;
+  }
+
+  .paper__flap {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 47%;
+    transform-origin: 50% 0%;
+    transform: translateZ(16px) rotateX(0deg);
+    transform-style: preserve-3d;
+    will-change: transform;
+  }
+  .paper__flap-face {
+    clip-path: polygon(0 0, 100% 0, 50% 100%);
+    backface-visibility: hidden;
+  }
+  .paper__flap-face--out {
+    background: linear-gradient(190deg, #f6eee0 0%, #e6d8bf 70%, #d3c09d 100%);
+    filter: drop-shadow(0 8px 14px rgba(80, 60, 30, 0.28));
+  }
+  /* The underside you see once the flap is peeled back. It is flipped about
+     its own centre to face backwards, so its triangle has to be mirrored to
+     land on the same silhouette as the outer face — otherwise the open flap
+     reads as a downward V instead of the upward point a folded-back flap makes. */
+  .paper__flap-face--in {
+    clip-path: polygon(0 100%, 100% 100%, 50% 0);
+    transform: rotateX(180deg);
+    background: linear-gradient(0deg, #ece0c9 0%, #d3c09d 55%, #bda87f 100%);
+  }
+
+  /* ── the card ──────────────────────────────────────────────── */
+  .card {
+    position: absolute;
+    left: 4%;
+    top: 4%;
+    width: 92%;
+    height: 92%;
+    transform: translateZ(6px);
+    transform-origin: 50% 100%;
+    background: linear-gradient(170deg, #fffdf9, #f7f0e4);
+    box-shadow: 0 14px 34px -8px rgba(88, 68, 36, 0.42);
+    color: var(--ink);
+    display: grid;
+    place-items: center;
+    will-change: transform;
+  }
+  .card__inner {
+    padding: 8%;
+    width: 100%;
+    outline: 1px solid rgba(176, 141, 79, 0.35);
+    outline-offset: -6%;
+  }
+  /* Addressed line, set above the couple like a hand-written envelope */
+  .card__to {
+    display: grid;
+    justify-items: center;
+    gap: 0.15em;
+    margin: 0 0 6%;
+    padding-bottom: 5%;
+    border-bottom: 1px solid rgba(176, 141, 79, 0.3);
+  }
+  .card__to-label {
+    font-size: clamp(0.42rem, 1.1vw, 0.56rem);
+    letter-spacing: 0.4em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+  }
+  .card__to-name {
+    font-family: var(--font-display);
+    font-style: italic;
+    font-size: clamp(1rem, 3.4vw, 1.6rem);
+    line-height: 1.2;
+    color: var(--gold);
+  }
+
+  .card__eyebrow {
+    font-size: clamp(0.5rem, 1.4vw, 0.66rem);
+    letter-spacing: 0.42em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin: 0 0 0.9rem;
+  }
+  .card__names {
+    font-family: var(--font-display);
+    font-weight: 300;
+    font-size: clamp(1.6rem, 6.2vw, 3rem);
+    line-height: 1.08;
+    margin: 0;
+  }
+  .card__names em { font-style: italic; color: var(--gold); margin-inline: 0.12em; }
+  .card__rule {
+    width: 42%;
+    height: 1px;
+    margin: clamp(0.8rem, 2.4vw, 1.4rem) auto;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  }
+  .card__meta {
+    font-size: clamp(0.5rem, 1.5vw, 0.7rem);
+    letter-spacing: 0.26em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    margin: 0;
+  }
+  .card__meta--city { margin-top: 0.5rem; color: var(--gold); }
+
+  /* ── wax seal ──────────────────────────────────────────────
+     Built in layers, the way a real stamped blob of wax reads:
+     a squeezed-out irregular skirt, the domed body over it, a bevelled
+     rim where the stamp bit, then the debossed monogram and one specular
+     highlight. Each half carries the whole disc and is cut by the tear,
+     so the two clips reassemble into a single unbroken seal. */
+  .seal {
+    position: absolute;
+    top: 46%;
+    left: 50%;
+    width: clamp(64px, 13.5%, 96px);
+    aspect-ratio: 1;
+    margin: 0;
+    translate: -50% -50%;
+    transform: translateZ(18px);
+    transform-style: preserve-3d;
+    pointer-events: none;
+    filter:
+      drop-shadow(0 2px 2px rgba(88, 22, 24, 0.45))
+      drop-shadow(0 7px 12px rgba(74, 30, 20, 0.38));
+  }
+  .seal__half {
+    position: absolute;
+    inset: 0;
+    will-change: transform;
+  }
+  /* torn edge down the middle, so the two halves read as one broken disc */
+  .seal__half--l { clip-path: polygon(0 0, 54% 0, 46% 26%, 56% 52%, 44% 78%, 52% 100%, 0 100%); }
+  .seal__half--r { clip-path: polygon(54% 0, 100% 0, 100% 100%, 52% 100%, 44% 78%, 56% 52%, 46% 26%); }
+
+  /* the wax body: uneven blob, never a perfect circle */
+  .seal__wax {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    /* a hand-pressed blob, not a rounded rectangle: an irregular
+       many-point polygon so no two "sides" share a radius */
+    clip-path: polygon(
+      52% 1%, 63% 3%, 71% 8%, 79% 6%, 88% 13%, 93% 17%, 99% 27%,
+      97% 36%, 100% 45%, 95% 54%, 99% 62%, 92% 70%, 94% 79%,
+      85% 85%, 80% 94%, 70% 91%, 61% 99%, 51% 95%, 42% 100%,
+      33% 92%, 24% 96%, 16% 87%, 8% 89%, 4% 78%, 9% 71%,
+      1% 63%, 6% 53%, 2% 44%, 8% 35%, 5% 25%, 14% 20%,
+      18% 10%, 28% 14%, 36% 4%, 44% 9%
+    );
+    rotate: -6deg;
+    background:
+      /* wax tooth: a fine grain so the dome is not glassy */
+      url('/gallery/noise.png') repeat,
+      /* mottling: wax never cools to one flat tone */
+      radial-gradient(38% 30% at 66% 70%, rgba(120, 24, 30, 0.5), transparent 70%),
+      radial-gradient(30% 24% at 24% 68%, rgba(50, 6, 10, 0.4), transparent 70%),
+      /* pooled darkness at the rim where the wax cooled thickest */
+      radial-gradient(circle at 50% 52%, transparent 50%, rgba(88, 16, 22, 0.55) 76%, rgba(56, 8, 13, 0.9) 100%),
+      /* the domed body, lit from the upper-left like the rest of the scene */
+      radial-gradient(circle at 32% 24%, #e37b83 0%, #cc4650 16%, #ab2a35 38%, #8a1c26 62%, #6c1319 82%, #4f0d12 100%);
+    background-size: 110px, auto, auto, auto, auto;
+    background-blend-mode: soft-light, multiply, multiply, normal, normal;
+    box-shadow:
+      inset 0 -7px 14px rgba(46, 6, 10, 0.7),
+      inset 0 5px 9px rgba(255, 186, 186, 0.28),
+      inset 4px 0 12px rgba(46, 6, 10, 0.4),
+      inset -4px 2px 12px rgba(46, 6, 10, 0.4),
+      inset 0 0 3px rgba(255, 210, 210, 0.2);
+  }
+  /* wax squeezed out beyond the stamp: an irregular, thinner skirt with
+     a couple of small drips, the way an over-filled stamp actually spreads */
+  .seal__wax::before {
+    content: "";
+    position: absolute;
+    inset: -9%;
+    z-index: -1;
+    /* the squeezed-out skirt: a different irregular outline than the body
+       above it, wider and lumpier where the wax spread past the stamp */
+    clip-path: polygon(
+      54% 0%, 65% 4%, 74% 2%, 84% 10%, 90% 8%, 97% 19%, 100% 30%,
+      96% 39%, 100% 48%, 94% 58%, 98% 67%, 90% 74%, 93% 84%,
+      82% 88%, 76% 97%, 66% 93%, 57% 100%, 47% 94%, 38% 99%,
+      29% 90%, 20% 95%, 12% 84%, 5% 87%, 2% 75%, 7% 66%,
+      0% 57%, 4% 47%, 0% 37%, 6% 27%, 3% 16%, 12% 12%,
+      16% 3%, 26% 9%, 34% 1%, 43% 6%
+    );
+    rotate: 14deg;
+    background:
+      radial-gradient(circle at 46% 44%, #b3323f 38%, #841a24 72%, rgba(97, 16, 23, 0.3) 100%),
+      radial-gradient(10% 8% at 8% 62%, #7d1520 60%, transparent 100%),
+      radial-gradient(8% 7% at 90% 30%, #7d1520 60%, transparent 100%);
+    filter: blur(0.7px);
+  }
+  /* the bevelled ring the stamp's edge presses in, plus its sheen */
+  .seal__wax::after {
+    content: "";
+    position: absolute;
+    inset: 13%;
+    border-radius: 48% 52% 53% 47% / 52% 48% 47% 53%;
+    box-shadow:
+      inset 0 2px 3px rgba(40, 5, 10, 0.75),
+      inset 0 -2px 3px rgba(255, 170, 170, 0.24),
+      0 1px 2px rgba(255, 180, 180, 0.2);
+    background:
+      /* the main specular highlight, elongated the way a curved gloss reads */
+      radial-gradient(52% 34% at 30% 20%, rgba(255, 232, 232, 0.55), rgba(255, 226, 226, 0.16) 55%, transparent 72%),
+      /* a second, tighter glint slightly offset — the wet-look catch light */
+      radial-gradient(10% 8% at 24% 16%, rgba(255, 245, 245, 0.7), transparent 100%),
+      radial-gradient(circle at 64% 76%, rgba(40, 5, 10, 0.4), transparent 62%);
+  }
+  /* the debossed logo mark: an alpha mask of the brand mark filled with
+     the wax's own ink colour and lit the same way the monogram was, so it
+     reads as pressed into the wax rather than pasted on top. Both halves
+     place it at the same coordinates as the whole seal, so the half's own
+     clip-path is what splits one continuous mark into two torn pieces. */
+  .seal__mark {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #8d1c27;
+    -webkit-mask: url('/assets/logo-mark.png') center / 58% no-repeat;
+    mask: url('/assets/logo-mark.png') center / 58% no-repeat;
+    filter:
+      drop-shadow(0 -1.5px 1.5px rgba(40, 4, 9, 0.9))
+      drop-shadow(0 1px 0 rgba(255, 186, 186, 0.5));
+  }
+
+  .envelope__shadow {
+    position: absolute;
+    left: 50%;
+    bottom: -8%;
+    width: 70%;
+    height: 26px;
+    translate: -50% 0;
+    background: radial-gradient(50% 50% at 50% 50%, rgba(96, 74, 42, 0.42), transparent 70%);
+    filter: blur(7px);
+    will-change: transform, opacity;
+  }
+
+  /* ── controls ──────────────────────────────────────────────── */
+  .envelope__button {
+    position: relative;
+    z-index: 1;
+    overflow: hidden;
+    font: inherit;
+    color: inherit;
+    background: transparent;
+    border: 1px solid var(--gold);
+    color: var(--ink);
+    padding: 1rem 2.6rem;
+    font-size: 0.7rem;
+    letter-spacing: 0.32em;
+    text-transform: uppercase;
+    cursor: pointer;
+  }
+  .envelope__button::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: var(--gold);
+    transform: scaleX(0);
+    transform-origin: 0 50%;
+    transition: transform 0.65s var(--ease-out-expo);
+  }
+  .envelope__button:hover::before { transform: scaleX(1); }
+  .envelope__button:hover { color: var(--ivory); }
+  .envelope__button:disabled { pointer-events: none; opacity: 0.5; }
+
+  .envelope__hint {
+    margin: -1.25rem 0 0;
+    font-size: 0.58rem;
+    letter-spacing: 0.4em;
+    text-transform: uppercase;
+    color: rgba(122, 98, 58, 0.62);
+  }
+
+  /* Pre-hydration / no-JS fallback so the gate is never a permanent lock */
+  .envelope.is-open { opacity: 0; visibility: hidden; pointer-events: none; }
+
+  html.envelope-lock,
+  html.envelope-lock body { overflow: hidden; height: 100%; }
+
+  /* ── small screens ─────────────────────────────────────────
+     The card's height is a fraction of the envelope's WIDTH (3:2), so
+     on a narrow phone there is far less room for the same six lines of
+     type. Widen the envelope and tighten every vertical gap so the
+     addressed block, the names and the date all still fit inside. */
+  @media (max-width: 620px) {
+    .envelope { gap: clamp(1.25rem, 3.5vh, 2rem); padding: 1.5rem 0.9rem; }
+    .envelope__stage { width: min(560px, 93vw); }
+    .envelope__corner { width: 46px; height: 46px; opacity: 0.4; }
+
+    .card__inner { padding: 6% 5%; outline-offset: -4%; }
+
+    .card__to { margin-bottom: 4%; padding-bottom: 3.5%; gap: 0.1em; }
+    .card__to-label { font-size: 0.44rem; letter-spacing: 0.3em; }
+    .card__to-name { font-size: clamp(0.95rem, 4.6vw, 1.35rem); }
+
+    .card__eyebrow { font-size: 0.5rem; letter-spacing: 0.3em; margin-bottom: 0.5rem; }
+    .card__names { font-size: clamp(1.45rem, 7.4vw, 2.2rem); }
+    .card__rule { margin: 0.6rem auto; }
+    .card__meta { font-size: 0.5rem; letter-spacing: 0.18em; }
+    .card__meta--city { margin-top: 0.3rem; }
+  }
+
+  /* Landscape phones and short windows: the object plus the button and
+     hint have to share very little height. */
+  @media (max-height: 620px) {
+    .envelope__stage { width: min(460px, 78vw); }
+    .envelope { gap: 1rem; }
+    .envelope__corner { display: none; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .envelope { transition: opacity 0.4s linear, visibility 0.4s; }
+    .paper { cursor: pointer; }
+    .envelope__corner { animation: none; opacity: 0.55; }
+    .envelope__motes { display: none; }
+  }
+</style>
+
+<script>
+  import anime from 'animejs/lib/anime.es.js';
+
+  const envelope = document.querySelector<HTMLElement>('[data-envelope]');
+  const button = document.querySelector<HTMLButtonElement>('[data-open-invitation]');
+  const paper = document.querySelector<HTMLElement>('[data-paper]');
+  const flap = document.querySelector<HTMLElement>('[data-flap]');
+  const card = document.querySelector<HTMLElement>('[data-card]');
+  const shadow = document.querySelector<HTMLElement>('[data-shadow]');
+  const hint = document.querySelector<HTMLElement>('[data-hint]');
+  const sealHalves = Array.from(document.querySelectorAll<HTMLElement>('.seal__half'));
+
+  if (envelope && button && paper && flap && card) {
+    document.documentElement.classList.add('envelope-lock');
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    /* ── arrival: the envelope is set down on the table ──────── */
+    if (!reduced) {
+      anime
+        .timeline({ easing: 'cubicBezier(0.16, 1, 0.3, 1)' })
+        .add({
+          targets: paper,
+          translateY: [-90, 0],
+          rotateX: [34, 0],
+          rotateZ: [-6, 0],
+          scale: [0.86, 1],
+          opacity: [0, 1],
+          duration: 1500,
+        }, 200)
+        .add({ targets: shadow, opacity: [0, 1], scaleX: [0.55, 1], duration: 900 }, 700)
+        .add({
+          targets: sealHalves,
+          opacity: [0, 1],
+          scale: [0.4, 1],
+          duration: 900,
+          easing: 'spring(1, 78, 11, 0)',
+        }, 1100)
+        .add({ targets: [button, hint], opacity: [0, 1], translateY: [14, 0], duration: 900 }, 1250);
+    }
+
+    /* ── idle: paper breathes, and tilts toward the pointer ──── */
+    // Written straight onto the element each frame so it composes with the
+    // opening timeline being driven by anime on the same transform.
+    const REST_TILT = 13;
+    let tiltX = 0, tiltY = 0, targetX = 0, targetY = 0, lift = 0, targetLift = 0;
+    let opening = false;
+    let raf = 0;
+
+    const tick = (t: number) => {
+      tiltX += (targetX - tiltX) * 0.08;
+      tiltY += (targetY - tiltY) * 0.08;
+      lift += (targetLift - lift) * 0.08;
+      const float = Math.sin(t / 1400) * 4;
+      const breathe = Math.sin(t / 1900) * 0.9;
+      // REST_TILT lays the envelope back like an object on a table, so the
+      // flap foreshortens when it peels instead of reading as a flat cut-out
+      paper.style.transform =
+        `translate3d(0, ${float - lift}px, 0) rotateX(${REST_TILT + tiltX + breathe}deg) rotateY(${tiltY}deg)`;
+      if (shadow) {
+        const s = 1 - lift / 260 - Math.abs(float) / 220;
+        shadow.style.transform = `translate(-50%, 0) scaleX(${s}) scaleY(${s})`;
+        shadow.style.opacity = String(0.55 + (1 - s) * 0.4);
+      }
+      raf = requestAnimationFrame(tick);
+    };
+
+    if (!reduced) {
+      raf = requestAnimationFrame(tick);
+      envelope.addEventListener('pointermove', (e) => {
+        if (opening) return;
+        const r = paper.getBoundingClientRect();
+        targetY = ((e.clientX - (r.left + r.width / 2)) / r.width) * 16;
+        targetX = -((e.clientY - (r.top + r.height / 2)) / r.height) * 14;
+      });
+      envelope.addEventListener('pointerleave', () => { targetX = 0; targetY = 0; });
+      paper.addEventListener('pointerenter', () => { targetLift = 26; });
+      paper.addEventListener('pointerleave', () => { targetLift = 0; });
+    }
+
+    /* ── open: seal cracks, flap peels, card rises and fills ─── */
+    const open = () => {
+      if (opening) return;
+      opening = true;
+      button.disabled = true;
+      targetX = targetY = targetLift = 0;
+
+      if (reduced) {
+        window.dispatchEvent(new CustomEvent('invitation:open'));
+        document.documentElement.classList.remove('envelope-lock');
+        envelope.classList.add('is-open');
+        window.scrollTo(0, 0);
+        window.setTimeout(() => envelope.remove(), 600);
+        return;
+      }
+
+      const tl = anime.timeline({ easing: 'cubicBezier(0.16, 1, 0.3, 1)' });
+
+      // the wax gives: a shudder, then the two halves snap apart and drop
+      tl.add({
+        targets: paper,
+        keyframes: [
+          { rotateZ: -1.4, rotateX: REST_TILT, duration: 70, easing: 'linear' },
+          { rotateZ: 1.4, duration: 70, easing: 'linear' },
+          { rotateZ: 0, duration: 120, easing: 'linear' },
+          // straightens up as it is opened and offered to the reader
+          { rotateX: 7, duration: 1500, easing: 'cubicBezier(0.16, 1, 0.3, 1)' },
+        ],
+        // the idle loop owns `transform`; hand it over for the opening
+        begin: () => cancelAnimationFrame(raf),
+      }, 0);
+
+      tl.add({
+        targets: '.seal__half--l',
+        translateX: -70, translateY: 130, rotateZ: -46, opacity: [1, 0],
+        duration: 900, easing: 'easeInQuad',
+      }, 220)
+        .add({
+          targets: '.seal__half--r',
+          translateX: 74, translateY: 150, rotateZ: 52, opacity: [1, 0],
+          duration: 950, easing: 'easeInQuad',
+        }, 260);
+
+      // the flap resists, then peels all the way back
+      tl.add({
+        targets: flap,
+        keyframes: [
+          // resists for a moment, then gives and swings all the way back
+          { rotateX: -13, translateZ: 16, duration: 380, easing: 'easeOutQuad' },
+          { rotateX: -98, translateZ: 16, duration: 430, easing: 'easeInQuad' },
+          // settles just past vertical and drops to the back panel's own
+          // depth, so it stays hinged to the paper instead of floating off it
+          { rotateX: -152, translateZ: 2, duration: 560, easing: 'easeOutQuad' },
+        ],
+      }, 380);
+
+      // the whole object settles downward to make room for the raised flap
+      tl.add({
+        targets: document.querySelector('[data-stage]'),
+        translateY: [0, 40],
+        duration: 1200,
+      }, 380);
+
+      // The card is drawn out of the pocket: it stays in the paper's own
+      // plane while the pocket still grips it — only once the bottom edge is
+      // clear does it lift toward you and turn to face the reader.
+      tl.add({
+        targets: card,
+        keyframes: [
+          { translateY: '-14%', rotateZ: 0.7, translateZ: 6, duration: 420, easing: 'easeInOutQuad' },
+          { translateY: '-38%', rotateZ: -0.6, translateZ: 6, duration: 480, easing: 'linear' },
+          { translateY: '-52%', rotateZ: 0, translateZ: 8, duration: 420, easing: 'easeOutQuad' },
+          // free of the paper, and tipped up to be read
+          { translateY: '-56%', translateZ: 118, rotateX: -7, duration: 620, easing: 'easeOutQuad' },
+          { rotateX: 0, duration: 420, easing: 'easeInOutQuad' },
+        ],
+      }, 1500)
+        .add({ targets: [button, hint], opacity: 0, translateY: 10, duration: 400 }, 1200)
+        .add({ targets: shadow, opacity: 0, duration: 800 }, 1500);
+
+      // envelope body falls away, card grows into the page
+      tl.add({
+        targets: ['.paper__back', '.paper__pocket', '.paper__note', flap],
+        opacity: 0,
+        translateY: 110,
+        duration: 850,
+        easing: 'easeInCubic',
+      }, 3500)
+        .add({
+          targets: card,
+          scale: [1, 3.4],
+          translateY: '-52%',
+          opacity: [1, 0],
+          duration: 1250,
+          easing: 'cubicBezier(0.7, 0, 0.3, 1)',
+          begin: () => {
+            // hand the page over as the card opens out into it
+            window.dispatchEvent(new CustomEvent('invitation:open'));
+            document.documentElement.classList.remove('envelope-lock');
+            window.scrollTo(0, 0);
+          },
+        }, 3650)
+        .add({ targets: envelope, opacity: [1, 0], duration: 900 }, 3950);
+
+      tl.finished.then(() => envelope.remove());
+    };
+
+    button.addEventListener('click', open);
+    paper.addEventListener('click', open);
+  }
+</script>
