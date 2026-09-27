@@ -100,6 +100,8 @@ input:focus, select:focus { outline: 2px solid var(--accent); outline-offset: -1
 .upload-results { display: grid; gap: 6px; width: 100%; max-width: 680px; }
 .upload-result { display: flex; justify-content: space-between; gap: 14px; padding: 7px 9px; border: 1px solid var(--line); border-radius: 6px; font-size: 12px; }
 .upload-result strong { color: var(--muted); font-weight: 600; }
+.upload-result span { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.upload-result progress { flex: 0 0 120px; align-self: center; accent-color: var(--accent, currentColor); }
 .upload-result--done strong { color: var(--success, #287a4d); }
 .upload-result--failed strong { color: var(--danger); }
 label { display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: var(--muted); text-transform: capitalize; }

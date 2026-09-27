@@ -54,13 +54,13 @@ export default function Images() {
     setUploadResults(files.map((file) => ({ name: file.name, state: 'waiting' })));
     let uploaded = 0;
     for (const [index, file] of files.entries()) {
-      setUploadResults((current) => current.map((item, itemIndex) => itemIndex === index ? { ...item, state: 'uploading' } : item));
+      setUploadResults((current) => current.map((item, itemIndex) => itemIndex === index ? { ...item, state: 'uploading', progress: 0 } : item));
       try {
         const fd = new FormData();
         fd.append('file', file);
         fd.append('category', uploadCategory);
         if (alt) fd.append('alt', files.length === 1 ? alt : file.name.replace(/\.[^/.]+$/, ''));
-        await api.images.upload(fd);
+        await api.images.upload(fd, (progress) => setUploadResults((current) => current.map((item, itemIndex) => itemIndex === index ? { ...item, progress } : item)));
         uploaded += 1;
         setUploadResults((current) => current.map((item, itemIndex) => itemIndex === index ? { ...item, state: 'done' } : item));
       } catch (e2) {
@@ -107,7 +107,8 @@ export default function Images() {
             {uploadResults.map((item) => (
               <div className={`upload-result upload-result--${item.state}`} key={item.name}>
                 <span>{item.name}</span>
-                <strong>{item.state === 'waiting' ? 'Waiting' : item.state === 'uploading' ? 'Uploading…' : item.state === 'done' ? 'Uploaded' : item.error || 'Failed'}</strong>
+                {item.state === 'uploading' && <progress max="100" value={item.progress} aria-label={`Uploading ${item.name}`} />}
+                <strong>{item.state === 'waiting' ? 'Waiting' : item.state === 'uploading' ? `${item.progress}%` : item.state === 'done' ? 'Uploaded' : item.error || 'Failed'}</strong>
               </div>
             ))}
           </div>

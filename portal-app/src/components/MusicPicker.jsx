@@ -23,6 +23,7 @@ function fmt(s) {
  */
 export default function MusicPicker({ value, onChange }) {
   const [uploading, setUploading] = useState(false);
+  const [progress, setProgress] = useState(0);
   const [error, setError] = useState(null);
   const [duration, setDuration] = useState(0);
   const [playing, setPlaying] = useState(false);
@@ -48,13 +49,14 @@ export default function MusicPicker({ value, onChange }) {
       return;
     }
     setUploading(true);
+    setProgress(0);
     setError(null);
     try {
       const fd = new FormData();
       fd.append('file', file);
       fd.append('category', 'music');
       fd.append('alt', file.name.replace(/\.[^.]+$/, ''));
-      const uploaded = await api.images.upload(fd);
+      const uploaded = await api.images.upload(fd, setProgress);
       onChange({ track: uploaded.url, startAt: 0, endAt: 0, volume });
     } catch (err) {
       setError(err);
@@ -111,7 +113,7 @@ export default function MusicPicker({ value, onChange }) {
               {playing ? <><Icon name="pause" /> Stop</> : <><Icon name="play" /> Preview trim</>}
             </button>
             <label className="music-picker__replace">
-              {uploading ? 'Uploading…' : 'Replace'}
+              {uploading ? `Uploading… ${progress}%` : 'Replace'}
               <input ref={fileInput} type="file" accept="audio/*" hidden disabled={uploading} onChange={handleFile} />
             </label>
           </div>
@@ -176,7 +178,7 @@ export default function MusicPicker({ value, onChange }) {
         >
           <input ref={fileInput} type="file" accept="audio/*" hidden disabled={uploading} onChange={handleFile} />
           {uploading
-            ? 'Uploading…'
+            ? <>Uploading… {progress}% <progress max="100" value={progress} /></>
             : <><Icon name="music" /> Upload a track <span className="muted">MP3, up to 15MB</span></>}
         </button>
       )}

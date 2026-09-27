@@ -29,6 +29,31 @@ async function request(path, options = {}) {
 
 const json = (body) => JSON.stringify(body);
 
+/** A multipart upload that reports progress, which fetch cannot do: XHR
+    calls `onProgress` with 0–100 as bytes go out. Errors and the 401
+    redirect behave the same as `request`. */
+function uploadWithProgress(path, formData, onProgress) {
+  return new Promise((resolve, reject) => {
+    const xhr = new XMLHttpRequest();
+    xhr.open('POST', `${BASE}${path}`);
+    xhr.withCredentials = true;
+    if (onProgress) {
+      xhr.upload.onprogress = (e) => { if (e.lengthComputable) onProgress(Math.round((e.loaded / e.total) * 100)); };
+    }
+    xhr.onload = () => {
+      let data = null;
+      try { data = xhr.responseText ? JSON.parse(xhr.responseText) : null; } catch { /* non-JSON error page */ }
+      if (xhr.status >= 200 && xhr.status < 300) return resolve(data);
+      const err = new Error(data?.error || `${xhr.status} ${xhr.statusText}`);
+      err.status = xhr.status;
+      if (xhr.status === 401) window.location.href = '/login';
+      reject(err);
+    };
+    xhr.onerror = () => reject(new Error('Network error — upload failed'));
+    xhr.send(formData);
+  });
+}
+
 // Guest slugs are unique per wedding, so guest calls take an optional wedding
 // slug that becomes ?wedding=<slug>.
 const scoped = (path, wedding) => (wedding ? `${path}${path.includes('?') ? '&' : '?'}wedding=${encodeURIComponent(wedding)}` : path);
@@ -102,7 +127,7 @@ export const api = {
       if (guest_id) q.set('guest_id', String(guest_id));
       return request(`/api/uploads?${q}`);
     },
-    upload: (formData) => request('/api/uploads', { method: 'POST', body: formData }),
+    upload: (formData, onProgress) => uploadWithProgress('/api/uploads', formData, onProgress),
     remove: (id) => request(`/api/uploads/${id}`, { method: 'DELETE' }),
   },
 };
