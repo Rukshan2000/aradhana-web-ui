@@ -177,7 +177,8 @@ body[data-template="modern"] .tile__img {
 body[data-template="modern"] .tile:hover .tile__img { filter: none; }
 
 @media (max-width: 720px) {
-  body[data-template="modern"] .grid { grid-template-columns: repeat(2, 1fr) !important; }
+  body[data-template="modern"] .grid { grid-template-columns: 1fr !important; grid-auto-rows: auto !important; }
+  body[data-template="modern"] .tile { aspect-ratio: 1 / 1; }
 }
 
 /* ── Details ──────────────────────────────────────────────────────
