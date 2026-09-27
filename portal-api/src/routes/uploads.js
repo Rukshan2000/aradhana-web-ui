@@ -8,13 +8,13 @@ const router = asyncRouter();
 
 // Every route here is portal-only — nothing web-ui calls lives in this file.
 router.use(requireAuth);
-const MAX_IMAGE_SIZE = 5 * 1024 * 1024; // 5 MB
+const MAX_IMAGE_SIZE = 20 * 1024 * 1024; // 20 MB
 const MAX_AUDIO_SIZE = 15 * 1024 * 1024; // 15 MB — a few minutes of mp3
 // multer needs one ceiling for the stream; the per-category limit below is
 // enforced afterwards, once we know which kind of file this is.
 const upload = multer({
   storage: multer.memoryStorage(),
-  limits: { fileSize: MAX_AUDIO_SIZE },
+  limits: { fileSize: Math.max(MAX_IMAGE_SIZE, MAX_AUDIO_SIZE) },
 });
 
 // Upload one image or audio track -> stored in MinIO, recorded in the images
@@ -28,7 +28,7 @@ function uploadSingle(req, res, next) {
   upload.single('file')(req, res, (err) => {
     if (!err) return next();
     if (err.code === 'LIMIT_FILE_SIZE') {
-      return res.status(400).json({ error: `file must be ${MAX_AUDIO_SIZE / (1024 * 1024)}MB or smaller` });
+      return res.status(400).json({ error: `file must be ${Math.max(MAX_IMAGE_SIZE, MAX_AUDIO_SIZE) / (1024 * 1024)}MB or smaller` });
     }
     next(err);
   });

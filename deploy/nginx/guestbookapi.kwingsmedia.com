@@ -14,9 +14,9 @@ server {
     include /etc/letsencrypt/options-ssl-nginx.conf;
     ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
 
-    # The app caps music uploads at 15MB; nginx defaults to 1m, which would
+    # The app caps image uploads at 20MB; nginx defaults to 1m, which would
     # 413 them before the route ever ran.
-    client_max_body_size 16m;
+    client_max_body_size 21m;
 
     location / {
         proxy_pass http://127.0.0.1:4005;

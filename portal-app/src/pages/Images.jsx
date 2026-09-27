@@ -86,7 +86,7 @@ export default function Images() {
         <div className="upload-heading">
           <div>
             <h2>Bulk image upload</h2>
-            <p className="muted">Select several photos at once. Each image can be up to 5 MB.</p>
+            <p className="muted">Select several photos at once. Each image can be up to 20 MB.</p>
           </div>
           <Icon name="images" />
         </div>
@@ -101,7 +101,7 @@ export default function Images() {
           <label>alt text<input value={alt} onChange={(e) => setAlt(e.target.value)} /></label>
         </div>
         {err && <p className="error">{String(err.message)}</p>}
-        {files.length > 0 && <p className="muted upload-count">{files.length} image{files.length === 1 ? '' : 's'} selected · max 5 MB each</p>}
+        {files.length > 0 && <p className="muted upload-count">{files.length} image{files.length === 1 ? '' : 's'} selected · max 20 MB each</p>}
         {uploadResults.length > 0 && (
           <div className="upload-results" aria-live="polite">
             {uploadResults.map((item) => (

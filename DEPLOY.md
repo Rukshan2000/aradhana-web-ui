@@ -104,8 +104,8 @@ renewals work without touching TLS. All three renewal configs in
 `/etc/letsencrypt/renewal/` are set to `authenticator = webroot` and
 `installer = None`; verify with `certbot renew --dry-run`.
 
-The API vhost sets `client_max_body_size 16m`. nginx's global default is 1 MB,
-which would reject the app's 15 MB music uploads with a 413 before the route
+The API vhost sets `client_max_body_size 21m`. nginx's global default is 1 MB,
+which would reject the app's 20 MB image uploads with a 413 before the route
 ever ran.
 
 ## Routes worth knowing
