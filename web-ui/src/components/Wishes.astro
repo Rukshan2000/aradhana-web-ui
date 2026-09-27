@@ -1,26 +1,29 @@
 ---
-/* The notes guests left with their RSVP, newest first. Renders nothing until
-   someone has written one, so a fresh invitation has no empty wall. */
-const { wishes = [] } = Astro.props;
+/* The notes guests left with their RSVP, newest first, followed by three
+   sample wishes that are always shown so the wall is never empty. */
+const PLACEHOLDERS = [
+  { name: 'Amara', message: 'Wishing you a lifetime of love, laughter and happiness together.' },
+  { name: 'Nuwan & Family', message: 'May your home always be filled with joy. Congratulations to you both!' },
+  { name: 'Dilini', message: 'So happy for you two. Here is to a beautiful journey ahead!' },
+];
+const wishes = [...(Astro.props.wishes || []), ...PLACEHOLDERS];
 ---
-{wishes.length > 0 && (
-  <section class="section wishes" id="wishes">
-    <div class="wrap">
-      <header class="wishes__head">
-        <p class="eyebrow" data-reveal>Wishes</p>
-        <h2 data-split>Kind words from our guests</h2>
-      </header>
-      <ul class="wishes__list" data-stagger="80">
-        {wishes.map((wish) => (
-          <li class="wishes__card" data-reveal>
-            <blockquote>{wish.message}</blockquote>
-            <p class="wishes__name">— {wish.name}</p>
-          </li>
-        ))}
-      </ul>
-    </div>
-  </section>
-)}
+<section class="section wishes" id="wishes">
+  <div class="wrap">
+    <header class="wishes__head">
+      <p class="eyebrow" data-reveal>Wishes</p>
+      <h2 data-split>Kind words from our guests</h2>
+    </header>
+    <ul class="wishes__list" data-stagger="80">
+      {wishes.map((wish) => (
+        <li class="wishes__card" data-reveal>
+          <blockquote>{wish.message}</blockquote>
+          <p class="wishes__name">— {wish.name}</p>
+        </li>
+      ))}
+    </ul>
+  </div>
+</section>
 
 <style>
   .wishes__head { text-align: center; margin-bottom: 3rem; }
