@@ -39,6 +39,20 @@ async function publishedWedding(slug) {
  */
 const GONE = { error: 'invitation revoked', revoked: true };
 
+/** Guests' RSVP notes, shown on the invitation as a wall of wishes. Only the
+ *  name and the note go out — nothing that identifies or reaches a guest. */
+// ponytail: newest 50 only, add paging if a wedding outgrows it
+function publicWishes(weddingId) {
+  return db('guests')
+    .where({ wedding_id: weddingId })
+    .whereNull('revoked_at')
+    .whereNotNull('message')
+    .whereRaw("btrim(message) <> ''")
+    .orderBy('responded_at', 'desc', 'last')
+    .limit(50)
+    .select('name', 'message');
+}
+
 /** Appends -2, -3 … until the guest slug is free inside this wedding. */
 async function uniqueGuestSlug(weddingId, base) {
   const root = base || 'guest';
@@ -382,7 +396,7 @@ router.get('/:weddingSlug/invite', async (req, res) => {
   const wedding = await publishedWedding(req.params.weddingSlug);
   if (!wedding) return res.status(404).json({ error: 'wedding not found' });
   if (wedding.open_revoked_at) return res.status(410).json(GONE);
-  res.json({ wedding, guest: null, open_rsvp: wedding.open_rsvp !== false });
+  res.json({ wedding, guest: null, open_rsvp: wedding.open_rsvp !== false, wishes: await publicWishes(wedding.id) });
 });
 
 // Public: the open form posts here. Unlike the personalised RSVP there is no
@@ -490,7 +504,7 @@ router.get('/:weddingSlug/invite/:inviteeSlug', async (req, res) => {
   // existed. Nothing about the guest goes out with it.
   if (guest.revoked_at) return res.status(410).json(GONE);
 
-  res.json({ wedding, guest: publicGuest(guest) });
+  res.json({ wedding, guest: publicGuest(guest), wishes: await publicWishes(wedding.id) });
 });
 
 // Public: the invitation's own RSVP form posts here. Addressed by the same

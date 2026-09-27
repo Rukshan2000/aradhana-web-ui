@@ -1,0 +1,57 @@
+---
+/* The notes guests left with their RSVP, newest first. Renders nothing until
+   someone has written one, so a fresh invitation has no empty wall. */
+const { wishes = [] } = Astro.props;
+---
+{wishes.length > 0 && (
+  <section class="section wishes" id="wishes">
+    <div class="wrap">
+      <header class="wishes__head">
+        <p class="eyebrow" data-reveal>Wishes</p>
+        <h2 data-split>Kind words from our guests</h2>
+      </header>
+      <ul class="wishes__list" data-stagger="80">
+        {wishes.map((wish) => (
+          <li class="wishes__card" data-reveal>
+            <blockquote>{wish.message}</blockquote>
+            <p class="wishes__name">— {wish.name}</p>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+)}
+
+<style>
+  .wishes__head { text-align: center; margin-bottom: 3rem; }
+  .wishes__list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    columns: 3 18rem;
+    column-gap: 1.5rem;
+  }
+  .wishes__card {
+    break-inside: avoid;
+    margin-bottom: 1.5rem;
+    padding: 1.75rem;
+    border: var(--rule);
+    background: var(--ivory-deep);
+  }
+  .wishes__card blockquote {
+    margin: 0;
+    font-family: var(--font-display);
+    font-style: italic;
+    font-size: 1.2rem;
+    line-height: 1.5;
+    white-space: pre-line;
+    overflow-wrap: anywhere;
+  }
+  .wishes__name {
+    margin: 1rem 0 0;
+    font-size: 0.75rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--gold);
+  }
+</style>
