@@ -99,22 +99,6 @@ const calendarUrl = (() => {
         </fieldset>
       )}
 
-      {openRsvp && (
-        <label class="field" data-reveal="right">
-          <span>How many attending</span>
-          <input
-            type="number"
-            name="attending_count"
-            required
-            min="1"
-            max={MAX_SEATS}
-            step="1"
-            value="1"
-            inputmode="numeric"
-          />
-        </label>
-      )}
-
       <fieldset class="field field--full choice" data-reveal="right">
         <legend>Will you attend?</legend>
         <div class="choice__options">
@@ -141,6 +125,22 @@ const calendarUrl = (() => {
           </label>
         </div>
       </fieldset>
+
+      {openRsvp && (
+        <label class="field" data-reveal="right">
+          <span>How many attending</span>
+          <input
+            type="number"
+            name="attending_count"
+            required
+            min="1"
+            max={MAX_SEATS}
+            step="1"
+            value="1"
+            inputmode="numeric"
+          />
+        </label>
+      )}
 
       <label class="field field--full" data-reveal>
         <span>A note for the couple</span>
