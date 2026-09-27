@@ -7,7 +7,7 @@ import Icon from './Icon.jsx';
 /** Every key the editor manages, with the empty value a fresh wedding starts
     from. Keeps the form's shape stable even before anything has been typed. */
 const EMPTY_CONTENT = {
-  hero: { src: '', alt: '' },
+  hero: { src: '', mobileSrc: '', alt: '' },
   // Every heading the invitation prints, so none of them is stranded in the
   // markup where only a developer can change it.
   headings: {
@@ -25,15 +25,19 @@ const EMPTY_CONTENT = {
   galleryPool: [],
   details: [],
   schedule: [],
-  venuePhoto: { src: '', alt: '' },
+  venuePhoto: { src: '', mobileSrc: '', alt: '' },
   music: { track: '', startAt: 0, endAt: 0, volume: 0.5 },
 };
 
-const STORY_ROW = { year: '', title: '', text: '', photo: '', alt: '' };
-const GALLERY_ROW = { src: '', alt: '', span: '' };
-const POOL_ROW = { src: '', alt: '' };
+const STORY_ROW = { year: '', title: '', text: '', photo: '', mobilePhoto: '', alt: '' };
+const GALLERY_ROW = { src: '', mobileSrc: '', alt: '', span: '' };
+const POOL_ROW = { src: '', mobileSrc: '', alt: '' };
 const DETAILS_ROW = { label: '', time: '', venue: '', address: '', mapUrl: '', note: '' };
 const SCHEDULE_ROW = { time: '', event: '' };
+
+/** Every photo slot has an optional second photo for phones (768px wide or
+    less), for pictures whose crop only works on one screen shape. */
+const MOBILE_LABEL = 'Mobile photo (optional — used on phones instead)';
 
 /** One field of one row in a repeatable list. */
 function RowField({ label, value, onChange, type = 'text', textarea, options, media, onMediaPick, placeholder }) {
@@ -251,6 +255,10 @@ export default function ContentEditor({ weddingSlug, content }) {
                 if (meta.alt && !form.hero.alt) setField('hero', 'alt', meta.alt);
               }}
             />
+            <RowField
+              label={MOBILE_LABEL} media="hero" value={form.hero.mobileSrc}
+              onMediaPick={(url) => setField('hero', 'mobileSrc', url)}
+            />
             <RowField label="Description (for accessibility)" value={form.hero.alt} onChange={(v) => setField('hero', 'alt', v)} />
           </div>
         </fieldset>
@@ -268,6 +276,7 @@ export default function ContentEditor({ weddingSlug, content }) {
             { key: 'title', label: 'Title' },
             { key: 'text', label: 'Text', textarea: true },
             { key: 'photo', label: 'Photo', media: 'story', altKey: 'alt' },
+            { key: 'mobilePhoto', label: MOBILE_LABEL, media: 'story' },
             { key: 'alt', label: 'Photo description' },
           ]}
         />
@@ -282,6 +291,7 @@ export default function ContentEditor({ weddingSlug, content }) {
           onChange={(v) => set('gallery', v)}
           fields={[
             { key: 'src', label: 'Photo', media: 'gallery', altKey: 'alt' },
+            { key: 'mobileSrc', label: MOBILE_LABEL, media: 'gallery' },
             { key: 'alt', label: 'Description' },
             {
               key: 'span', label: 'Size',
@@ -302,6 +312,7 @@ export default function ContentEditor({ weddingSlug, content }) {
           onChange={(v) => set('galleryPool', v)}
           fields={[
             { key: 'src', label: 'Photo', media: 'gallery', altKey: 'alt' },
+            { key: 'mobileSrc', label: MOBILE_LABEL, media: 'gallery' },
             { key: 'alt', label: 'Description' },
           ]}
         />
@@ -347,6 +358,10 @@ export default function ContentEditor({ weddingSlug, content }) {
                 setField('venuePhoto', 'src', url);
                 if (meta.alt && !form.venuePhoto.alt) setField('venuePhoto', 'alt', meta.alt);
               }}
+            />
+            <RowField
+              label={MOBILE_LABEL} media="venue" value={form.venuePhoto.mobileSrc}
+              onMediaPick={(url) => setField('venuePhoto', 'mobileSrc', url)}
             />
             <RowField label="Description" value={form.venuePhoto.alt} onChange={(v) => setField('venuePhoto', 'alt', v)} />
           </div>

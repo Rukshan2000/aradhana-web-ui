@@ -31,14 +31,17 @@ const title = heading?.title?.trim() || countedTitle(story, weddingYear);
     <div class="story__card" data-story-carousel>
       <figure class="story__media">
         {story.map((chapter, i) => (
-          <img
-            src={chapter.photo}
-            alt={chapter.alt}
-            class={`story__img ${i === 0 ? 'is-active' : ''}`}
-            data-slide-img
-            loading={i === 0 ? 'eager' : 'lazy'}
-            decoding="async"
-          />
+          <picture style="display:contents">
+            {chapter.mobilePhoto && <source media="(max-width: 768px)" srcset={chapter.mobilePhoto} />}
+            <img
+              src={chapter.photo}
+              alt={chapter.alt}
+              class={`story__img ${i === 0 ? 'is-active' : ''}`}
+              data-slide-img
+              loading={i === 0 ? 'eager' : 'lazy'}
+              decoding="async"
+            />
+          </picture>
         ))}
       </figure>
 

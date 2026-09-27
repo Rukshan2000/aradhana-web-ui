@@ -22,6 +22,8 @@ const { gallery = defaultGallery, galleryPool = defaultGalleryPool, heading = de
               class="tile__img is-active"
               data-face="a"
               src={photo.src}
+              data-src={photo.src}
+              data-mobile-src={photo.mobileSrc}
               alt={photo.alt}
               loading="lazy"
               decoding="async"
@@ -100,6 +102,15 @@ const { gallery = defaultGallery, galleryPool = defaultGalleryPool, heading = de
     } catch {
       return;
     }
+    /* Each photo may have a separate crop for phones; the same breakpoint
+       as the <picture> sources elsewhere on the page. */
+    const mobile = matchMedia('(max-width: 768px)').matches;
+    const pick = (photo) => (mobile && photo.mobileSrc) || photo.src;
+    const faces = [...grid.querySelectorAll('[data-face="a"]')];
+    faces.forEach((a) => {
+      a.photo = { src: a.dataset.src, mobileSrc: a.dataset.mobileSrc, alt: a.alt };
+      if (mobile && a.dataset.mobileSrc) a.src = a.dataset.mobileSrc;
+    });
     if (!pool.length) return;
 
     const tiles = [...grid.querySelectorAll('.tile')].map((tile) => ({
@@ -130,14 +141,15 @@ const { gallery = defaultGallery, galleryPool = defaultGalleryPool, heading = de
       const img = new Image();
       img.decoding = 'async';
       img.onload = () => {
-        const outgoing = { src: showing.src, alt: showing.alt };
+        const outgoing = showing.photo;
 
         /* Fade the new photo in ON TOP; the old one keeps covering the
            tile until the fade is over, so no background ever shows. */
         hidden.classList.remove('is-active');
         hidden.classList.add('is-entering');
-        hidden.src = next.src;
+        hidden.src = pick(next);
         hidden.alt = next.alt;
+        hidden.photo = next;
         void hidden.offsetWidth;
         hidden.classList.add('is-active');
         hidden.removeAttribute('aria-hidden');
@@ -152,7 +164,7 @@ const { gallery = defaultGallery, galleryPool = defaultGalleryPool, heading = de
         }, 1200);
       };
       img.onerror = () => { tile.busy = false; };
-      img.src = next.src;
+      img.src = pick(next);
     };
 
     setInterval(swapOne, 3200);

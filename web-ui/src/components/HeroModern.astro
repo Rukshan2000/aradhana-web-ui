@@ -19,7 +19,10 @@ const { couple = defaultCouple, hero = defaultHero, heading = defaultHeadings.he
     </div>
   </div>
   <div class="hero-modern__media">
-    <img src={hero.src} alt={hero.alt} width="1200" height="1500" fetchpriority="high" decoding="async" />
+    <picture style="display:contents">
+      {hero.mobileSrc && <source media="(max-width: 768px)" srcset={hero.mobileSrc} />}
+      <img src={hero.src} alt={hero.alt} width="1200" height="1500" fetchpriority="high" decoding="async" />
+    </picture>
   </div>
 </header>
 

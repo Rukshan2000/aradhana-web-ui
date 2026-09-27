@@ -7,15 +7,18 @@ const { couple = defaultCouple, hero = defaultHero, heading = defaultHeadings.he
        the hero photo sits fully visible beneath it from the start so the
        curtain parts onto a finished stage rather than a fading one. -->
   <div class="hero__media">
-    <img
-      data-hero-photo
-      src={hero.src}
-      alt={hero.alt}
-      width="2000"
-      height="1250"
-      fetchpriority="high"
-      decoding="async"
-    />
+    <picture style="display:contents">
+      {hero.mobileSrc && <source media="(max-width: 768px)" srcset={hero.mobileSrc} />}
+      <img
+        data-hero-photo
+        src={hero.src}
+        alt={hero.alt}
+        width="2000"
+        height="1250"
+        fetchpriority="high"
+        decoding="async"
+      />
+    </picture>
     <div class="hero__clouds" data-vanta-clouds aria-hidden="true"></div>
   </div>
 

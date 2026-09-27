@@ -121,7 +121,10 @@ const calendarUrl = (() => {
 
   <figure class="banner" data-curtain data-wipe="left">
     <span class="banner__layer" data-parallax="0.3" data-scrub="zoom">
-      <img src={venuePhoto.src} alt={venuePhoto.alt} loading="lazy" decoding="async" />
+      <picture style="display:contents">
+        {venuePhoto.mobileSrc && <source media="(max-width: 768px)" srcset={venuePhoto.mobileSrc} />}
+        <img src={venuePhoto.src} alt={venuePhoto.alt} loading="lazy" decoding="async" />
+      </picture>
     </span>
   </figure>
 
