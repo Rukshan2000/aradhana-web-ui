@@ -1,0 +1,94 @@
+---
+import { couple as defaultCouple, guest as fallbackGuest } from '../data/wedding.js';
+/* The "modern" gate: a full-bleed cover screen instead of classic's folded
+   paper/wax-seal object. Same contract as Envelope.astro (data-envelope,
+   data-open-invitation, envelope-lock, invitation:open) so motion.js,
+   track.js and Music.astro all still hook into it unchanged. */
+const { guest = fallbackGuest, couple = defaultCouple, openInvite = false } = Astro.props;
+const addressee = openInvite ? 'Invitation for you' : guest.name;
+---
+<div class="envelope-modern" id="envelope" data-envelope>
+  <div class="envelope-modern__inner">
+    <p class="envelope-modern__eyebrow">{!openInvite ? `For ${addressee}` : 'You are invited'}</p>
+    <h1 class="envelope-modern__names">{couple.bride} <span>&</span> {couple.groom}</h1>
+    <p class="envelope-modern__meta">{couple.dateLabel} — {couple.city}</p>
+    <button type="button" class="envelope-modern__button" data-open-invitation data-open>
+      Enter invitation
+    </button>
+  </div>
+</div>
+
+<style>
+  .envelope-modern {
+    position: fixed;
+    inset: 0;
+    z-index: 200;
+    display: grid;
+    place-items: end start;
+    background: var(--gold);
+    color: var(--ivory);
+    padding: clamp(1.5rem, 5vw, 4rem);
+    transition: opacity 0.6s ease, visibility 0.6s;
+  }
+  .envelope-modern__inner { max-width: 40rem; }
+  .envelope-modern__eyebrow {
+    margin: 0 0 1rem;
+    font-size: 0.7rem;
+    letter-spacing: 0.4em;
+    text-transform: uppercase;
+    color: var(--gold-light);
+  }
+  .envelope-modern__names {
+    margin: 0 0 1rem;
+    font-family: var(--font-display);
+    font-weight: 400;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+    font-size: clamp(2.4rem, 8vw, 5.5rem);
+    line-height: 0.95;
+  }
+  .envelope-modern__names span { color: var(--gold-light); }
+  .envelope-modern__meta {
+    margin: 0 0 2.5rem;
+    font-size: 0.85rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--blush);
+  }
+  .envelope-modern__button {
+    font: inherit;
+    background: var(--ivory);
+    color: var(--gold);
+    border: none;
+    padding: 1rem 2.4rem;
+    font-size: 0.75rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+  }
+  .envelope-modern__button:hover { transform: translateX(6px); }
+
+  .envelope-modern.is-open { opacity: 0; visibility: hidden; pointer-events: none; }
+  html.envelope-lock, html.envelope-lock body { overflow: hidden; height: 100%; }
+</style>
+
+<script>
+  const envelope = document.querySelector<HTMLElement>('[data-envelope]');
+  const button = document.querySelector<HTMLButtonElement>('[data-open-invitation]');
+
+  if (envelope && button) {
+    document.documentElement.classList.add('envelope-lock');
+
+    const open = () => {
+      button.disabled = true;
+      window.dispatchEvent(new CustomEvent('invitation:open'));
+      document.documentElement.classList.remove('envelope-lock');
+      envelope.classList.add('is-open');
+      window.scrollTo(0, 0);
+      window.setTimeout(() => envelope.remove(), 650);
+    };
+
+    button.addEventListener('click', open);
+  }
+</script>

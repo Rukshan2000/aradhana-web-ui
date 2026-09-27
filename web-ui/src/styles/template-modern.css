@@ -1,0 +1,236 @@
+/* ── "Modern" template ────────────────────────────────────────────
+   The complete alternative skin for the invitation, selected per wedding
+   via `weddings.template_id` and applied as `data-template` on <body>
+   (Base.astro). global.css is the classic design; nothing here applies
+   without the attribute, so classic is never touched.
+
+   Direction: editorial rather than romantic. Left-aligned instead of
+   centred, hard rules between sections instead of open air, a strict
+   uniform grid instead of a masonry collage, photography grayscale until
+   hover, and none of classic's ornaments.
+
+   `!important` is used deliberately: these rules have to beat Astro's
+   component-scoped styles (which carry an extra attribute selector) and
+   the inline `text-align:center` several sections set on their wrapper. */
+
+body[data-template="modern"] {
+  --ivory: #f7f7f5;
+  --ivory-deep: #ececea;
+  --ink: #1b1c1e;
+  --ink-soft: #55575c;
+  --gold: #2f3a4c;
+  --gold-light: #6b7789;
+  --blush: #dfe3e6;
+  --sage: #4c5a52;
+
+  --font-display: "Jost", ui-sans-serif, system-ui, sans-serif;
+  --font-body: "Jost", ui-sans-serif, system-ui, sans-serif;
+  --font-script: "Jost", ui-sans-serif, system-ui, sans-serif;
+
+  --rule: 1px solid rgba(47, 58, 76, 0.28);
+}
+
+/* ── Type ─────────────────────────────────────────────────────── */
+body[data-template="modern"] h1,
+body[data-template="modern"] h2,
+body[data-template="modern"] h3,
+body[data-template="modern"] h4 {
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+body[data-template="modern"] h2 {
+  font-size: clamp(1.9rem, 4.5vw, 3.2rem);
+  line-height: 1.02;
+}
+/* Classic sets a handwriting face on these; modern has no script voice. */
+body[data-template="modern"] .script {
+  font-family: var(--font-body) !important;
+  font-style: normal !important;
+}
+/* Purely decorative flourishes classic scatters through the page. */
+body[data-template="modern"] .ornament { display: none !important; }
+
+/* ── Strip classic's printed-stationery layer ─────────────────────
+   The paper grain, the hairline gold frame around the viewport, the
+   lozenge marking each section seam, the engraved corner ticks and the
+   diamond on every eyebrow all belong to the printed-invitation
+   conceit. Modern is a website, so none of them apply. */
+body[data-template="modern"]::before,
+body[data-template="modern"]::after,
+body[data-template="modern"] .section + .section::before,
+body[data-template="modern"] .section > .wrap:first-of-type::before,
+body[data-template="modern"] .section > .wrap:first-of-type::after {
+  content: none !important;
+  display: none !important;
+}
+
+/* ── Section rhythm ───────────────────────────────────────────────
+   Classic floats centred blocks in open space. Modern rules each
+   section off from the one above it and hangs everything on the left. */
+body[data-template="modern"] .section {
+  padding: clamp(3.5rem, 8vh, 6.5rem) var(--gutter);
+  border-top: 1px solid var(--gold-light);
+}
+body[data-template="modern"] .wrap,
+body[data-template="modern"] .narrow {
+  max-width: 1240px;
+  margin-inline: 0;
+  text-align: left !important;
+}
+/* Section headers are centred throughout classic; modern hangs them left. */
+body[data-template="modern"] .story__head,
+body[data-template="modern"] .gallery__head,
+body[data-template="modern"] .details__head,
+body[data-template="modern"] .calendar {
+  text-align: left !important;
+}
+body[data-template="modern"] .eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.7rem;
+  color: var(--gold);
+  font-size: 0.68rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+}
+body[data-template="modern"] .eyebrow::before {
+  content: "";
+  width: 2rem;
+  height: 1px;
+  background: var(--gold);
+}
+
+/* ── Countdown ────────────────────────────────────────────────────
+   The meadow of grass and blooms is classic's signature; modern reads
+   the clock as a hard bordered row of cells instead. */
+body[data-template="modern"] .meadow { display: none !important; }
+body[data-template="modern"] .clock {
+  max-width: none !important;
+  margin: 2.5rem 0 0 !important;
+  gap: 0 !important;
+  border: 1px solid var(--gold-light);
+}
+body[data-template="modern"] .clock__cell {
+  padding: clamp(1rem, 3vw, 2rem);
+  text-align: left;
+  border-right: 1px solid var(--gold-light);
+}
+body[data-template="modern"] .clock__cell:last-child { border-right: none; }
+body[data-template="modern"] .clock__value {
+  display: block;
+  font-size: clamp(2.2rem, 6vw, 4rem);
+  line-height: 1;
+  color: var(--ink);
+}
+body[data-template="modern"] .clock__label {
+  font-size: 0.6rem;
+  letter-spacing: 0.28em;
+  color: var(--ink-soft);
+}
+body[data-template="modern"] .countdown__note {
+  margin-top: 1.5rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+}
+
+/* ── Story ────────────────────────────────────────────────────────
+   One squared, hard-bordered panel: photo and text as equal halves. */
+body[data-template="modern"] .story__card {
+  max-width: none !important;
+  margin-inline: 0 !important;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important;
+  gap: 0 !important;
+  border: 1px solid var(--gold-light);
+}
+body[data-template="modern"] .story__media {
+  aspect-ratio: 1 / 1 !important;
+  max-height: none !important;
+}
+body[data-template="modern"] .story__img { filter: grayscale(1); }
+body[data-template="modern"] .story__body { padding: clamp(1.5rem, 4vw, 3rem); }
+body[data-template="modern"] .story__year {
+  font-size: 2rem;
+  color: var(--gold-light);
+  letter-spacing: 0;
+}
+
+/* ── Gallery ──────────────────────────────────────────────────────
+   Classic's collage of tall/wide tiles becomes one strict grid of
+   equal squares, hairline-gapped, colour arriving only on hover. */
+body[data-template="modern"] .grid {
+  grid-template-columns: repeat(3, 1fr) !important;
+  grid-auto-rows: clamp(150px, 19vw, 250px) !important;
+  gap: 2px !important;
+}
+body[data-template="modern"] .tile,
+body[data-template="modern"] .tile--tall,
+body[data-template="modern"] .tile--wide {
+  grid-column: span 1 !important;
+  grid-row: span 1 !important;
+}
+body[data-template="modern"] .tile__img {
+  filter: grayscale(1);
+  transition: filter 0.5s ease;
+}
+body[data-template="modern"] .tile:hover .tile__img { filter: none; }
+
+@media (max-width: 720px) {
+  body[data-template="modern"] .grid { grid-template-columns: repeat(2, 1fr) !important; }
+}
+
+/* ── Details ──────────────────────────────────────────────────────
+   Cards lose their lift, corner flourishes and rounding, and sit in
+   one continuous bordered band. */
+body[data-template="modern"] .cards {
+  gap: 0 !important;
+  border: 1px solid var(--gold-light);
+}
+body[data-template="modern"] .card {
+  perspective: none !important;
+  border-right: 1px solid var(--gold-light);
+}
+body[data-template="modern"] .card:last-child { border-right: none; }
+body[data-template="modern"] .card__corner { display: none !important; }
+body[data-template="modern"] .card__inner {
+  border: none !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  transform: none !important;
+}
+
+/* Body copy classic centres and balances on the measure. */
+body[data-template="modern"] .rsvp__lede,
+body[data-template="modern"] .card__note,
+body[data-template="modern"] .card__time,
+body[data-template="modern"] .card__address {
+  text-align: left !important;
+  margin-inline: 0 !important;
+}
+
+/* ── RSVP ─────────────────────────────────────────────────────────
+   Square everything; the form reads as a filing card, not a keepsake. */
+body[data-template="modern"] .form { margin-top: 2.5rem !important; }
+body[data-template="modern"] .form input,
+body[data-template="modern"] .form select,
+body[data-template="modern"] .form textarea,
+body[data-template="modern"] .form button,
+body[data-template="modern"] .choice__box {
+  border-radius: 0 !important;
+}
+
+/* ── Footer ───────────────────────────────────────────────────────
+   Classic closes on near-black; modern closes on the accent itself,
+   left-aligned, with the nav as a plain uppercase row. */
+body[data-template="modern"] .footer {
+  background: var(--gold) !important;
+  color: var(--ivory) !important;
+}
+body[data-template="modern"] .footer .narrow { text-align: left !important; }
+body[data-template="modern"] .footer__names {
+  font-family: var(--font-display) !important;
+  text-transform: uppercase;
+  font-size: clamp(1.6rem, 4vw, 2.6rem);
+}
+body[data-template="modern"] .footer__nav { justify-content: flex-start !important; }

@@ -1,0 +1,60 @@
+---
+import { couple as defaultCouple, guest as fallbackGuest, headings as defaultHeadings } from '../data/wedding.js';
+/* "Notebook" invitation: the note itself, written out as a letter on the
+   ruled page. Same props as Invitation.astro. */
+const { guest = fallbackGuest, couple = defaultCouple, openInvite = false, heading = defaultHeadings.invitation } = Astro.props;
+const addressee = openInvite ? 'friend' : guest.name;
+---
+<section class="section note" id="invitation">
+  <div class="wrap">
+    <p class="eyebrow" data-reveal>{heading.eyebrow}</p>
+    <h2 class="note__head" data-reveal>{heading.title}</h2>
+
+    <p class="note__salutation" data-reveal>Dear {addressee},</p>
+    <p class="note__body" data-reveal>
+      With hearts full of gratitude, we would love you with us on the day we
+      marry — to sit with us, eat with us, and see us begin.
+    </p>
+    <p class="note__body" data-reveal>
+      It would not be the same without you.
+    </p>
+
+    <p class="note__signoff" data-reveal>with all our love,</p>
+    <p class="note__sign" data-reveal>{couple.bride} &amp; {couple.groom}</p>
+
+    <p class="note__ps" data-reveal>
+      p.s. — {couple.dateLabel}, in {couple.city}.
+      <a href="#rsvp">let us know you're coming &rarr;</a>
+    </p>
+  </div>
+</section>
+
+<style>
+  .note__head { margin: 0 0 var(--rule-gap); }
+  .note__salutation,
+  .note__body,
+  .note__signoff,
+  .note__ps {
+    margin: 0 0 var(--rule-gap);
+    max-width: 46ch;
+    font-family: var(--font-body);
+    font-size: 1.05rem;
+    line-height: var(--rule-gap);
+    color: var(--ink);
+  }
+  .note__signoff { margin-bottom: 0; }
+  .note__sign {
+    margin: 0 0 var(--rule-gap);
+    font-family: var(--font-display);
+    font-size: clamp(2rem, 5vw, 3rem);
+    line-height: calc(var(--rule-gap) * 1.5);
+    color: var(--gold);
+  }
+  .note__ps { color: var(--ink-soft); }
+  .note__ps a {
+    color: var(--gold);
+    text-decoration: none;
+    border-bottom: 2px solid var(--margin-rule);
+  }
+  .note__ps a:hover { color: var(--ink); }
+</style>

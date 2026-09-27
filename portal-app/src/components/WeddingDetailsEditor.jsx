@@ -7,7 +7,7 @@ import Icon from './Icon.jsx';
 const EMPTY = {
   bride: '', groom: '', hashtag: '', city: '', venue: '',
   event_date: '', date_label: '', year_label: '', reply_by: '',
-  notes: '', published: true, open_rsvp: false,
+  notes: '', published: true, open_rsvp: false, template_id: 'classic',
 };
 
 /** `event_date` is stored as a timestamp but edited with a
@@ -35,6 +35,7 @@ const fromWedding = (wedding) => ({
   notes: wedding?.notes ?? '',
   published: wedding?.published ?? true,
   open_rsvp: wedding?.open_rsvp ?? false,
+  template_id: wedding?.template_id ?? 'classic',
 });
 
 /**
@@ -140,6 +141,14 @@ export default function WeddingDetailsEditor({ weddingSlug, wedding, onSaved }) 
             <label>
               RSVP by, as printed
               <input value={form.reply_by} placeholder="the first of November" onChange={(e) => set('reply_by', e.target.value)} />
+            </label>
+            <label>
+              Invitation template
+              <select value={form.template_id} onChange={(e) => set('template_id', e.target.value)}>
+                <option value="classic">Classic</option>
+                <option value="modern">Modern</option>
+                <option value="notebook">Notebook</option>
+              </select>
             </label>
           </div>
 

@@ -1,0 +1,121 @@
+---
+import { couple as defaultCouple, hero as defaultHero, headings as defaultHeadings } from '../data/wedding.js';
+/* "Notebook" hero: the first page of the book — the names written large
+   across the ruling, with the hero photograph taped onto the page beside
+   them. Same props as Hero.astro. */
+const { couple = defaultCouple, hero = defaultHero, heading = defaultHeadings.hero } = Astro.props;
+---
+<header class="page" id="top">
+  <div class="page__text">
+    <p class="page__eyebrow">{heading.eyebrow}</p>
+    <h1 class="page__names">{couple.bride} <span>&amp;</span> {couple.groom}</h1>
+    <p class="page__meta">{couple.dateLabel}</p>
+    <p class="page__meta">{couple.city}</p>
+    <p class="page__links">
+      <a href="#rsvp">reply to us &rarr;</a>
+      <a href="#details">where &amp; when &rarr;</a>
+    </p>
+  </div>
+
+  <figure class="page__photo">
+    <span class="page__tape page__tape--l" aria-hidden="true"></span>
+    <span class="page__tape page__tape--r" aria-hidden="true"></span>
+    <img src={hero.src} alt={hero.alt} width="1200" height="1500" fetchpriority="high" decoding="async" />
+    <figcaption>us, last spring</figcaption>
+  </figure>
+</header>
+
+<style>
+  .page {
+    display: grid;
+    grid-template-columns: 1fr minmax(0, 22rem);
+    align-items: center;
+    justify-items: start;
+    gap: clamp(2rem, 6vw, 5rem);
+    min-height: 100svh;
+    padding: clamp(3rem, 10vh, 7rem) clamp(2rem, 8vw, 6rem) clamp(3rem, 8vh, 5rem)
+             clamp(2.5rem, 9vw, 7rem);
+  }
+
+  .page__eyebrow {
+    margin: 0;
+    font-family: var(--font-body);
+    font-size: 1.05rem;
+    line-height: var(--rule-gap);
+    color: var(--gold);
+  }
+  .page__names {
+    margin: 0;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: clamp(2.6rem, 7.5vw, 5rem);
+    /* Two ruled lines per line of writing, so the names still sit on the
+       ruling even at display size. */
+    line-height: calc(var(--rule-gap) * 2);
+    color: var(--ink);
+  }
+  .page__names span { color: var(--margin-rule); }
+  .page__meta {
+    margin: 0;
+    font-family: var(--font-body);
+    font-size: 1.05rem;
+    line-height: var(--rule-gap);
+    color: var(--ink-soft);
+  }
+  .page__links {
+    margin: var(--rule-gap) 0 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    line-height: var(--rule-gap);
+  }
+  .page__links a {
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    color: var(--gold);
+    text-decoration: none;
+    border-bottom: 2px solid var(--margin-rule);
+  }
+  .page__links a:hover { color: var(--ink); }
+
+  /* The photograph, taped onto the page at a slight angle. */
+  .page__photo {
+    position: relative;
+    margin: 0;
+    rotate: 2deg;
+    padding: 0.6rem 0.6rem 0.3rem;
+    background: #fff;
+    box-shadow: 0 12px 26px -14px rgba(60, 50, 30, 0.6);
+  }
+  .page__photo img {
+    display: block;
+    width: 100%;
+    /* An explicit height is required alongside aspect-ratio here: the img
+       carries intrinsic width/height attributes, which otherwise win. */
+    height: auto;
+    aspect-ratio: 4 / 5;
+    object-fit: cover;
+  }
+  .page__photo figcaption {
+    font-family: var(--font-display);
+    font-size: 1.3rem;
+    text-align: center;
+    padding: 0.35rem 0 0.15rem;
+    color: var(--ink-soft);
+  }
+  .page__tape {
+    position: absolute;
+    top: -0.85rem;
+    width: 4.2rem;
+    height: 1.5rem;
+    background: rgba(236, 226, 194, 0.75);
+    box-shadow: 0 1px 2px rgba(60, 46, 20, 0.28);
+  }
+  .page__tape--l { left: -1.2rem; rotate: -30deg; }
+  .page__tape--r { right: -1.2rem; rotate: 28deg; }
+
+  @media (max-width: 860px) {
+    .page { grid-template-columns: 1fr; }
+    .page__photo { max-width: 20rem; }
+  }
+</style>

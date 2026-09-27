@@ -1,9 +1,14 @@
 ---
 import '../styles/global.css';
+/* The "modern" template's skin. Entirely scoped to body[data-template="modern"],
+   so loading it here never affects the classic design. */
+import '../styles/template-modern.css';
+/* Likewise the "notebook" template, scoped to body[data-template="notebook"]. */
+import '../styles/template-notebook.css';
 /* `wedding` / `invitee` are stamped on <body> so the client-side tracker
    knows which invitation it is reporting on; a page without them (the 404,
    the expired page) simply does not track. */
-const { title, description, wedding = '', invitee = '' } = Astro.props;
+const { title, description, wedding = '', invitee = '', 'data-template': templateId = 'classic' } = Astro.props;
 ---
 <!doctype html>
 <html lang="en">
@@ -20,10 +25,10 @@ const { title, description, wedding = '', invitee = '' } = Astro.props;
     <link rel="preconnect" href="https://images.unsplash.com" />
     <link
       rel="stylesheet"
-      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Jost:wght@200;300;400&family=Alex+Brush&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Jost:wght@200;300;400&family=Alex+Brush&family=Caveat:wght@400;600;700&family=Kalam:wght@300;400&display=swap"
     />
   </head>
-  <body data-wedding={wedding} data-invitee={invitee}>
+  <body data-wedding={wedding} data-invitee={invitee} data-template={templateId}>
     <div class="progress" aria-hidden="true"><span data-progress></span></div>
     <slot />
     <script>

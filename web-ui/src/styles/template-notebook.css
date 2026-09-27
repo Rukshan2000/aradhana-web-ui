@@ -1,0 +1,308 @@
+/* ── "Notebook" template ──────────────────────────────────────────
+   A ruled exercise-book page: the whole invitation written out by hand
+   on lined paper, with a red margin rule down the left and photographs
+   taped onto the page.
+
+   Selected per wedding via `weddings.template_id` and applied as
+   `data-template` on <body> (Base.astro). Nothing here applies without
+   the attribute, so classic and modern are untouched.
+
+   `--rule-gap` is the single source of truth for the ruling: the lines
+   are drawn every `--rule-gap`, and body copy is given exactly that
+   line-height so the writing sits ON the rules rather than drifting
+   across them. Change it in one place and the page stays ruled.
+
+   `!important` is used where a rule has to beat Astro's
+   component-scoped styles or an inline `text-align`. */
+
+body[data-template="notebook"] {
+  --rule-gap: 2rem;
+  --paper: #fdfaf0;
+  --rule-line: rgba(94, 130, 168, 0.42);
+  --margin-rule: rgba(196, 88, 88, 0.5);
+
+  --ivory: #fdfaf0;
+  --ivory-deep: #f3ecd9;
+  --ink: #23324b;
+  --ink-soft: #4a5b78;
+  --gold: #2f4a7a;
+  --gold-light: #7d97bd;
+  --blush: #e7dcc6;
+  --sage: #6d8268;
+
+  --font-display: "Caveat", "Bradley Hand", cursive;
+  --font-body: "Kalam", "Comic Sans MS", cursive;
+  --font-script: "Caveat", "Bradley Hand", cursive;
+
+  --rule: 1px solid rgba(94, 130, 168, 0.4);
+
+  /* The ruling itself. Drawn on the body so it runs continuously behind
+     every section instead of restarting at each one. */
+  background-color: var(--paper);
+  background-image: repeating-linear-gradient(
+    to bottom,
+    transparent 0,
+    transparent calc(var(--rule-gap) - 1px),
+    var(--rule-line) calc(var(--rule-gap) - 1px),
+    var(--rule-line) var(--rule-gap)
+  );
+  color: var(--ink);
+  font-family: var(--font-body);
+  line-height: var(--rule-gap);
+}
+
+/* Sections must not paint over the ruling. */
+body[data-template="notebook"] .section,
+body[data-template="notebook"] .invitation,
+body[data-template="notebook"] .countdown,
+body[data-template="notebook"] .story,
+body[data-template="notebook"] .gallery,
+body[data-template="notebook"] .details,
+body[data-template="notebook"] .rsvp {
+  background: transparent !important;
+}
+
+/* The red margin rule down the left of the page. This slot holds
+   classic's hairline gold frame, repurposed rather than added to. */
+body[data-template="notebook"]::after {
+  content: "";
+  position: fixed;
+  inset: 0 auto 0 clamp(1.25rem, 5vw, 4.5rem);
+  z-index: 50;
+  width: 2px;
+  height: 100%;
+  border: none;
+  background: var(--margin-rule);
+  pointer-events: none;
+}
+@media (max-width: 700px) {
+  body[data-template="notebook"]::after { display: block; }
+}
+
+/* ── Handwriting ──────────────────────────────────────────────────
+   Everything is written, so nothing is uppercased or letter-spaced —
+   both read as typesetting, which is exactly what this template is not. */
+body[data-template="notebook"] h1,
+body[data-template="notebook"] h2,
+body[data-template="notebook"] h3,
+body[data-template="notebook"] h4 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  text-transform: none !important;
+  letter-spacing: 0 !important;
+  line-height: 1.1;
+  color: var(--ink);
+}
+body[data-template="notebook"] h2 { font-size: clamp(2.4rem, 6vw, 4rem); }
+
+body[data-template="notebook"] .eyebrow,
+body[data-template="notebook"] .clock__label,
+body[data-template="notebook"] .countdown__note,
+body[data-template="notebook"] .footer__meta,
+body[data-template="notebook"] .footer__nav a,
+body[data-template="notebook"] .card__label,
+body[data-template="notebook"] .schedule__time,
+body[data-template="notebook"] .story__year {
+  font-family: var(--font-display) !important;
+  text-transform: none !important;
+  letter-spacing: 0 !important;
+  font-size: 1.15rem !important;
+  color: var(--gold) !important;
+}
+/* Classic's diamond bullet gives way to a hand-drawn dash. */
+body[data-template="notebook"] .eyebrow::before {
+  content: "~" !important;
+  font-size: 1em !important;
+  vertical-align: baseline !important;
+  opacity: 0.8;
+}
+
+/* Body copy sits on the ruling. */
+body[data-template="notebook"] p,
+body[data-template="notebook"] li,
+body[data-template="notebook"] .story__copy,
+body[data-template="notebook"] .invitation__body,
+body[data-template="notebook"] .rsvp__lede {
+  line-height: var(--rule-gap) !important;
+  font-size: 1.05rem;
+}
+
+/* ── Page furniture ───────────────────────────────────────────────
+   Classic's engraved section ornaments are printer's marks; a notebook
+   has none. The paper grain (body::before) is kept — it is the stock. */
+body[data-template="notebook"] .section + .section::before,
+body[data-template="notebook"] .section > .wrap:first-of-type::before,
+body[data-template="notebook"] .section > .wrap:first-of-type::after {
+  content: none !important;
+  display: none !important;
+}
+body[data-template="notebook"] .ornament { display: none !important; }
+
+/* Writing starts clear of the margin rule. */
+body[data-template="notebook"] .section {
+  padding-left: clamp(2.5rem, 9vw, 7rem);
+  padding-block: clamp(2.5rem, 6vh, 4.5rem);
+}
+body[data-template="notebook"] .wrap,
+body[data-template="notebook"] .narrow {
+  margin-inline: 0;
+  text-align: left !important;
+}
+body[data-template="notebook"] .story__head,
+body[data-template="notebook"] .gallery__head,
+body[data-template="notebook"] .details__head,
+body[data-template="notebook"] .calendar,
+body[data-template="notebook"] .rsvp__lede,
+body[data-template="notebook"] .card__note,
+body[data-template="notebook"] .footer .narrow {
+  text-align: left !important;
+  margin-inline: 0 !important;
+}
+
+/* ── Photographs, taped to the page ───────────────────────────────
+   A white print border, a small rotation and a strip of tape at the
+   top — the way a photo actually ends up in a scrapbook. */
+body[data-template="notebook"] .tile,
+body[data-template="notebook"] .story__media {
+  background: #fff !important;
+  padding: 0.5rem 0.5rem 1.75rem !important;
+  box-shadow: 0 6px 16px -8px rgba(60, 50, 30, 0.55);
+  overflow: visible !important;
+}
+body[data-template="notebook"] .tile { rotate: -1.2deg; }
+body[data-template="notebook"] .tile:nth-child(even) { rotate: 1.4deg; }
+body[data-template="notebook"] .tile:nth-child(3n) { rotate: -0.6deg; }
+body[data-template="notebook"] .story__media { rotate: -1.5deg; }
+
+body[data-template="notebook"] .tile::after,
+body[data-template="notebook"] .story__media::after {
+  content: "";
+  position: absolute;
+  top: -0.7rem;
+  left: 50%;
+  translate: -50% 0;
+  width: 4.5rem;
+  height: 1.4rem;
+  rotate: -2deg;
+  background: rgba(226, 214, 178, 0.75);
+  box-shadow: 0 1px 2px rgba(90, 76, 44, 0.25);
+  pointer-events: none;
+}
+/* Classic oversizes this layer (±11%) and drifts it on scroll, so no edge
+   is ever exposed by the parallax. Here the tile is a physical print with
+   a visible white border, so the layer is pinned to exactly the border's
+   inset instead and the drift is dropped — otherwise the photograph
+   slides out of its own frame. */
+body[data-template="notebook"] .tile__layer {
+  inset: 0.5rem 0.5rem 1.75rem !important;
+  height: auto !important;
+  overflow: hidden;
+  transform: none !important;
+}
+
+/* ── Countdown, written out in the margin ─────────────────────────
+   The meadow belongs to classic; here the four figures are simply
+   written on the page with a rule under each, like a sum. */
+body[data-template="notebook"] .meadow { display: none !important; }
+body[data-template="notebook"] .clock {
+  max-width: none !important;
+  margin: 1rem 0 0 !important;
+  gap: clamp(1rem, 4vw, 3rem) !important;
+  grid-template-columns: repeat(4, max-content) !important;
+}
+body[data-template="notebook"] .clock__cell { text-align: left; }
+body[data-template="notebook"] .clock__value {
+  display: block;
+  font-family: var(--font-display);
+  font-size: clamp(2.6rem, 7vw, 4.5rem);
+  line-height: 1.1;
+  color: var(--ink);
+  border-bottom: 2px solid var(--margin-rule);
+}
+
+/* ── Story ────────────────────────────────────────────────────────
+   A page of the book: photo taped at the left, the entry written
+   beside it. No card, no border — the paper is the surface. */
+body[data-template="notebook"] .story__card {
+  max-width: none !important;
+  margin-inline: 0 !important;
+  gap: clamp(1.5rem, 5vw, 3.5rem) !important;
+  align-items: start !important;
+}
+body[data-template="notebook"] .story__body { padding-top: 1rem; }
+
+/* ── Gallery ──────────────────────────────────────────────────────
+   Prints laid out on the page rather than a flush architectural grid. */
+body[data-template="notebook"] .grid {
+  grid-template-columns: repeat(3, 1fr) !important;
+  gap: clamp(1.5rem, 4vw, 3rem) !important;
+}
+body[data-template="notebook"] .tile,
+body[data-template="notebook"] .tile--tall,
+body[data-template="notebook"] .tile--wide {
+  grid-column: span 1 !important;
+  grid-row: span 1 !important;
+}
+@media (max-width: 720px) {
+  body[data-template="notebook"] .grid { grid-template-columns: repeat(2, 1fr) !important; }
+}
+
+/* ── Details ──────────────────────────────────────────────────────
+   Notes jotted under a heading, separated by a ruled line. */
+body[data-template="notebook"] .cards {
+  gap: clamp(1.5rem, 4vw, 3rem) !important;
+}
+body[data-template="notebook"] .card { perspective: none !important; }
+body[data-template="notebook"] .card__corner { display: none !important; }
+body[data-template="notebook"] .card__inner {
+  border: none !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  transform: none !important;
+  border-bottom: 2px solid var(--margin-rule) !important;
+  background: transparent !important;
+}
+
+/* ── RSVP ─────────────────────────────────────────────────────────
+   A form to fill in by hand: no boxes, just ruled blanks to write on. */
+/* Field labels are set as small caps in classic; here they are simply
+   written above the blank, like the headings on a filled-in form. */
+body[data-template="notebook"] .field,
+body[data-template="notebook"] .choice {
+  font-family: var(--font-body) !important;
+  text-transform: none !important;
+  letter-spacing: 0 !important;
+  font-size: 1rem;
+}
+body[data-template="notebook"] .form input,
+body[data-template="notebook"] .form select,
+body[data-template="notebook"] .form textarea {
+  font-family: var(--font-body) !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+}
+body[data-template="notebook"] .choice__box {
+  border-radius: 0 !important;
+  background: transparent !important;
+}
+
+/* ── Footer ───────────────────────────────────────────────────────
+   Signed off at the bottom of the page, still on the same paper. */
+body[data-template="notebook"] .footer {
+  background: transparent !important;
+  color: var(--ink) !important;
+  border-top: 2px solid var(--margin-rule);
+  padding-left: clamp(2.5rem, 9vw, 7rem);
+}
+body[data-template="notebook"] .footer__names {
+  font-family: var(--font-display) !important;
+  font-size: clamp(2rem, 5vw, 3rem);
+  color: var(--ink);
+}
+body[data-template="notebook"] .footer__nav { justify-content: flex-start !important; }
+body[data-template="notebook"] .footer__nav a,
+body[data-template="notebook"] .footer__credit {
+  font-family: var(--font-body) !important;
+  text-transform: none !important;
+  letter-spacing: 0 !important;
+}

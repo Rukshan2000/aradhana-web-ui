@@ -119,6 +119,7 @@ export function toCouple(wedding, fallback) {
     // Carried through for the calendar entry, which wants the actual venue
     // rather than the city the invitation prints under the couple's names.
     venue: wedding.venue ?? fallback.venue ?? null,
+    templateId: wedding.template_id ?? fallback.templateId ?? 'classic',
   };
 }
 

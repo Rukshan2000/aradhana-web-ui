@@ -6,7 +6,8 @@
     "date": "2026-12-12T16:30:00+05:30",
     "dateLabel": "Saturday, 12 December 2026",
     "yearLabel": "2026",
-    "city": "Kandy, Sri Lanka"
+    "city": "Kandy, Sri Lanka",
+    "templateId": "classic"
   },
   "guest": {
     "id": "G000",

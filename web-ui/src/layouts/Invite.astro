@@ -4,8 +4,14 @@
    and `/[wedding]/[invitee]` with the pair loaded from portal-api. */
 import Base from './Base.astro';
 import Envelope from '../components/Envelope.astro';
+import EnvelopeModern from '../components/EnvelopeModern.astro';
+import EnvelopeNotebook from '../components/EnvelopeNotebook.astro';
 import Hero from '../components/Hero.astro';
+import HeroModern from '../components/HeroModern.astro';
+import HeroNotebook from '../components/HeroNotebook.astro';
 import Invitation from '../components/Invitation.astro';
+import InvitationModern from '../components/InvitationModern.astro';
+import InvitationNotebook from '../components/InvitationNotebook.astro';
 import Countdown from '../components/Countdown.astro';
 import Story from '../components/Story.astro';
 import Gallery from '../components/Gallery.astro';
@@ -30,11 +36,21 @@ const title = `${couple.bride} & ${couple.groom} — ${couple.dateLabel}`;
 const description = guest.slug
   ? `${guest.name}, you are invited to celebrate the wedding of ${couple.bride} and ${couple.groom} in ${couple.city}.`
   : `Join ${couple.bride} and ${couple.groom} in ${couple.city} as they celebrate their wedding. Ceremony details, schedule, gallery, and RSVP.`;
+/* Each template supplies its own gate, hero and invitation note; the
+   sections below those are shared and skinned by CSS
+   (src/styles/template-*.css). An unknown id falls back to classic. */
+const TEMPLATES = {
+  classic: { Gate: Envelope, Top: Hero, Note: Invitation, butterflies: true },
+  modern: { Gate: EnvelopeModern, Top: HeroModern, Note: InvitationModern, butterflies: false },
+  notebook: { Gate: EnvelopeNotebook, Top: HeroNotebook, Note: InvitationNotebook, butterflies: false },
+};
+const templateId = couple.templateId || 'classic';
+const { Gate, Top, Note, butterflies } = TEMPLATES[templateId] || TEMPLATES.classic;
 ---
-<Base title={title} description={description} wedding={weddingSlug} invitee={guest.slug}>
-  <Envelope guest={guest} couple={couple} openInvite={openRsvp} />
-  <Hero couple={couple} hero={content.hero} heading={content.headings.hero} />
-  <Invitation guest={guest} couple={couple} openInvite={openRsvp} heading={content.headings.invitation} />
+<Base title={title} description={description} wedding={weddingSlug} invitee={guest.slug} data-template={templateId}>
+  <Gate guest={guest} couple={couple} openInvite={openRsvp} />
+  <Top couple={couple} hero={content.hero} heading={content.headings.hero} />
+  <Note guest={guest} couple={couple} openInvite={openRsvp} heading={content.headings.invitation} />
   <Countdown couple={couple} heading={content.headings.countdown} />
   <Story story={content.story} heading={content.headings.story} weddingYear={new Date(couple.date).getFullYear()} />
   <Gallery gallery={content.gallery} galleryPool={content.galleryPool} heading={content.headings.gallery} />
@@ -43,6 +59,6 @@ const description = guest.slug
   <Rsvp guest={guest} couple={couple} replyBy={replyBy} weddingSlug={weddingSlug} openRsvp={openRsvp}
     closed={rsvpClosed} heading={content.headings.rsvp} />
   <Footer couple={couple} />
-  <Butterflies />
+  {butterflies && <Butterflies />}
   <Music music={content.music} />
 </Base>
