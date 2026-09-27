@@ -8,6 +8,7 @@ const EMPTY = {
   bride: '', groom: '', hashtag: '', city: '', venue: '',
   event_date: '', date_label: '', year_label: '', reply_by: '',
   notes: '', published: true, open_rsvp: false, template_id: 'classic',
+  sample_wishes: true,
 };
 
 /** `event_date` is stored as a timestamp but edited with a
@@ -36,6 +37,7 @@ const fromWedding = (wedding) => ({
   published: wedding?.published ?? true,
   open_rsvp: wedding?.open_rsvp ?? false,
   template_id: wedding?.template_id ?? 'classic',
+  sample_wishes: wedding?.sample_wishes ?? true,
 });
 
 /**
@@ -165,6 +167,10 @@ export default function WeddingDetailsEditor({ weddingSlug, wedding, onSaved }) 
             <label className="checkbox">
               <input type="checkbox" checked={form.open_rsvp} onChange={(e) => set('open_rsvp', e.target.checked)} />
               Open RSVP — anyone with the shared link can reply for themselves
+            </label>
+            <label className="checkbox">
+              <input type="checkbox" checked={form.sample_wishes} onChange={(e) => set('sample_wishes', e.target.checked)} />
+              Sample wishes — show three example wishes alongside guests' own
             </label>
           </div>
 

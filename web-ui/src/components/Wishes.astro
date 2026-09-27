@@ -1,42 +1,67 @@
 ---
-/* The notes guests left with their RSVP, newest first, followed by three
-   sample wishes that are always shown so the wall is never empty. */
+/* The notes guests left with their RSVP, newest first, as a carousel. The
+   couple can add three sample wishes from the portal (`sample_wishes`) so the
+   wall is never empty; with those off and no real notes, nothing renders. */
 const PLACEHOLDERS = [
   { name: 'Amara', message: 'Wishing you a lifetime of love, laughter and happiness together.' },
   { name: 'Nuwan & Family', message: 'May your home always be filled with joy. Congratulations to you both!' },
   { name: 'Dilini', message: 'So happy for you two. Here is to a beautiful journey ahead!' },
 ];
-const wishes = [...(Astro.props.wishes || []), ...PLACEHOLDERS];
+const { samples = true } = Astro.props;
+const wishes = [...(Astro.props.wishes || []), ...(samples ? PLACEHOLDERS : [])];
 ---
-<section class="section wishes" id="wishes">
-  <div class="wrap">
-    <header class="wishes__head">
-      <p class="eyebrow" data-reveal>Wishes</p>
-      <h2 data-split>Kind words from our guests</h2>
-    </header>
-    <ul class="wishes__list" data-stagger="80">
-      {wishes.map((wish) => (
-        <li class="wishes__card" data-reveal>
-          <blockquote>{wish.message}</blockquote>
-          <p class="wishes__name">— {wish.name}</p>
-        </li>
-      ))}
-    </ul>
-  </div>
-</section>
+{wishes.length > 0 && (
+  <section class="section wishes" id="wishes">
+    <div class="wrap">
+      <header class="wishes__head">
+        <p class="eyebrow" data-reveal>Wishes</p>
+        <h2 data-split>Kind words from our guests</h2>
+      </header>
+      <div class="wishes__carousel" data-wishes-carousel data-reveal>
+        <button type="button" class="wishes__arrow" data-dir="-1" aria-label="Previous wish">‹</button>
+        <ul class="wishes__track" data-track aria-label="Wishes from guests">
+          {wishes.map((wish) => (
+            <li class="wishes__card">
+              <blockquote>{wish.message}</blockquote>
+              <p class="wishes__name">— {wish.name}</p>
+            </li>
+          ))}
+        </ul>
+        <button type="button" class="wishes__arrow" data-dir="1" aria-label="Next wish">›</button>
+      </div>
+    </div>
+  </section>
+)}
 
 <style>
   .wishes__head { text-align: center; margin-bottom: 3rem; }
-  .wishes__list {
+  .wishes__carousel {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 0.75rem;
+  }
+  .wishes__track {
     list-style: none;
     margin: 0;
     padding: 0;
-    columns: 3 18rem;
-    column-gap: 1.5rem;
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: calc((100% - 3rem) / 3);
+    gap: 1.5rem;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scroll-behavior: smooth;
+    scrollbar-width: none;
   }
+  .wishes__track::-webkit-scrollbar { display: none; }
+  @media (max-width: 900px) { .wishes__track { grid-auto-columns: calc((100% - 1.5rem) / 2); } }
+  @media (max-width: 600px) { .wishes__track { grid-auto-columns: 100%; } }
   .wishes__card {
-    break-inside: avoid;
-    margin-bottom: 1.5rem;
+    scroll-snap-align: start;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
     padding: 1.75rem;
     border: var(--rule);
     background: var(--ivory-deep);
@@ -57,4 +82,49 @@ const wishes = [...(Astro.props.wishes || []), ...PLACEHOLDERS];
     text-transform: uppercase;
     color: var(--gold);
   }
+  .wishes__arrow {
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 50%;
+    border: var(--rule);
+    background: transparent;
+    color: var(--gold);
+    font-size: 1.5rem;
+    line-height: 1;
+    cursor: pointer;
+  }
+  .wishes__arrow:hover { background: var(--ivory-deep); }
+  @media (max-width: 600px) { .wishes__arrow { width: 2rem; height: 2rem; } }
+  @media (prefers-reduced-motion: reduce) { .wishes__track { scroll-behavior: auto; } }
 </style>
+
+<script>
+  // Arrows step one card; autoplay advances every 5s, wrapping at the end,
+  // and pauses while the visitor is hovering, touching or focused inside.
+  document.querySelectorAll<HTMLElement>('[data-wishes-carousel]').forEach((root) => {
+    const track = root.querySelector<HTMLElement>('[data-track]')!;
+    const step = (dir: number) => {
+      const card = track.firstElementChild as HTMLElement | null;
+      if (!card) return;
+      const width = card.offsetWidth + parseFloat(getComputedStyle(track).columnGap || '0');
+      const atEnd = track.scrollLeft + track.clientWidth >= track.scrollWidth - 2;
+      const atStart = track.scrollLeft <= 2;
+      if (dir > 0 && atEnd) track.scrollTo({ left: 0 });
+      else if (dir < 0 && atStart) track.scrollTo({ left: track.scrollWidth });
+      else track.scrollBy({ left: dir * width });
+    };
+    root.querySelectorAll<HTMLButtonElement>('[data-dir]').forEach((btn) =>
+      btn.addEventListener('click', () => step(Number(btn.dataset.dir))),
+    );
+
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    let paused = false;
+    root.addEventListener('mouseenter', () => { paused = true; });
+    root.addEventListener('mouseleave', () => { paused = false; });
+    root.addEventListener('focusin', () => { paused = true; });
+    root.addEventListener('focusout', () => { paused = false; });
+    track.addEventListener('touchstart', () => { paused = true; }, { passive: true });
+    track.addEventListener('touchend', () => setTimeout(() => { paused = false; }, 4000), { passive: true });
+    setInterval(() => { if (!paused && !document.hidden) step(1); }, 5000);
+  });
+</script>

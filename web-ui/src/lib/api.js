@@ -120,6 +120,7 @@ export function toCouple(wedding, fallback) {
     // rather than the city the invitation prints under the couple's names.
     venue: wedding.venue ?? fallback.venue ?? null,
     templateId: wedding.template_id ?? fallback.templateId ?? 'classic',
+    sampleWishes: wedding.sample_wishes ?? true,
   };
 }
 

@@ -60,7 +60,7 @@ const { Gate, Top, Note, butterflies } = TEMPLATES[templateId] || TEMPLATES.clas
     couple={couple} heading={content.headings.details} scheduleHeading={content.headings.schedule} />
   <Rsvp guest={guest} couple={couple} replyBy={replyBy} weddingSlug={weddingSlug} openRsvp={openRsvp}
     closed={rsvpClosed} heading={content.headings.rsvp} />
-  <Wishes wishes={wishes} />
+  <Wishes wishes={wishes} samples={couple.sampleWishes !== false} />
   <Footer couple={couple} />
   {butterflies && <Butterflies />}
   <Music music={content.music} />

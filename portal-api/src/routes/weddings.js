@@ -75,7 +75,7 @@ async function findSelfGuestByPhone(weddingId, phone) {
 const FIELDS = [
   'slug', 'bride', 'groom', 'hashtag', 'city', 'event_date',
   'date_label', 'year_label', 'reply_by', 'venue', 'notes', 'published', 'open_rsvp',
-  'qr_url', 'template_id',
+  'qr_url', 'template_id', 'sample_wishes',
 ];
 
 // Shape of the free-form site content: array fields vs. single-object
