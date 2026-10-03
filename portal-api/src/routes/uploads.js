@@ -1,6 +1,7 @@
 import { asyncRouter } from '../asyncRouter.js';
 import multer from 'multer';
 import { uploadImage, deleteImage } from '../s3.js';
+import { shrinkImage } from '../shrink.js';
 import { db } from '../db.js';
 import { requireAuth } from '../auth.js';
 
@@ -59,12 +60,16 @@ router.post('/', uploadSingle, async (req, res) => {
       if (!owns) return res.status(404).json({ error: 'guest not found' });
     }
 
-    const { key, bucket, url } = await uploadImage(
-      req.file.buffer,
-      req.file.originalname,
-      req.file.mimetype,
-      category,
-    );
+    let { buffer, originalname, mimetype, size } = req.file;
+    const shrunk = category === 'music' ? null : await shrinkImage(buffer, mimetype);
+    if (shrunk) {
+      buffer = shrunk;
+      originalname = originalname.replace(/\.[^.]*$/, '') + '.jpg';
+      mimetype = 'image/jpeg';
+      size = shrunk.length;
+    }
+
+    const { key, bucket, url } = await uploadImage(buffer, originalname, mimetype, category);
 
     const [image] = await db('images')
       .insert({
@@ -75,8 +80,8 @@ router.post('/', uploadSingle, async (req, res) => {
         object_key: key,
         url,
         alt,
-        mime_type: req.file.mimetype,
-        size_bytes: req.file.size,
+        mime_type: mimetype,
+        size_bytes: size,
       })
       .returning('*');
 

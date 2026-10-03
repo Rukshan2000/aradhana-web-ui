@@ -31,6 +31,8 @@ export async function uploadImage(buffer, originalName, mimeType, prefix = 'uplo
       Key: key,
       Body: buffer,
       ContentType: mimeType,
+      // Keys are never reused, so the browser can keep the file for good.
+      CacheControl: 'public, max-age=31536000, immutable',
     }),
   );
 

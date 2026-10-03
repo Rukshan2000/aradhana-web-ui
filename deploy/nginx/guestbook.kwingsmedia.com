@@ -14,6 +14,12 @@ server {
     include /etc/letsencrypt/options-ssl-nginx.conf;
     ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
 
+    # nginx.conf has `gzip on` but leaves gzip_types commented out, so only
+    # HTML was compressed — the CSS and JS bundles went out raw.
+    gzip_types text/css application/javascript text/javascript application/json image/svg+xml;
+    gzip_comp_level 6;
+    gzip_vary on;
+
     # The bare root used to 301 here to the portal: it had no wedding slug and
     # fell back to rendering the sample couple, so the product's own address
     # looked like one stranger's wedding. `/` is now the product's landing
