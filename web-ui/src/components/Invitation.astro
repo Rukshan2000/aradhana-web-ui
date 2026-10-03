@@ -63,12 +63,16 @@ const showYear = couple.yearLabel && !String(couple.dateLabel || '').includes(co
   }
   .invitation__date {
     display: grid;
-    gap: 0.4rem;
+    gap: 0.6rem;
     margin-top: 2.5rem;
-    font-size: 0.78rem;
+    font-size: clamp(0.9rem, 1.6vw, 1.05rem);
     letter-spacing: 0.28em;
     text-transform: uppercase;
     color: var(--ink);
+  }
+  .invitation__date > span:first-child {
+    font-size: clamp(1.3rem, 3.2vw, 1.9rem);
+    letter-spacing: 0.16em;
   }
   /* ── Addressed plate ──────────────────────────────────────── */
   .plate {
