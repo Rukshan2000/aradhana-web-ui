@@ -35,9 +35,19 @@ const POOL_ROW = { src: '', mobileSrc: '', alt: '' };
 const DETAILS_ROW = { label: '', time: '', venue: '', address: '', mapUrl: '', note: '' };
 const SCHEDULE_ROW = { time: '', event: '' };
 
-/** Every photo slot has an optional second photo for phones (768px wide or
-    less), for pictures whose crop only works on one screen shape. */
-const MOBILE_LABEL = 'Mobile photo (optional — used on phones instead)';
+/** Every photo slot has an optional second photo for phones, for pictures
+    whose crop only works on one screen shape. The shapes are what each slot
+    actually measures on the classic template (desktop 1440px, phone 390px):
+    a photo of the wrong shape still loads, but `object-fit: cover` crops
+    away whatever doesn't fit. */
+const PHOTO_SHAPES = {
+  hero: ['landscape 16:10, e.g. 2400×1500', 'tall portrait 1:2, e.g. 1200×2400'],
+  story: ['portrait 4:5, e.g. 1200×1500', 'landscape 3:2, e.g. 1500×1000'],
+  gallery: ['landscape 5:4, e.g. 1500×1200', 'square 1:1, e.g. 1200×1200'],
+  venue: ['wide banner 9:4, e.g. 2400×1070', 'portrait 2:3, e.g. 1200×1800'],
+};
+const photoLabel = (slot) => `Photo — ${PHOTO_SHAPES[slot][0]}`;
+const mobileLabel = (slot) => `Mobile photo (optional, used on phones instead) — ${PHOTO_SHAPES[slot][1]}`;
 
 /** One field of one row in a repeatable list. */
 function RowField({ label, value, onChange, type = 'text', textarea, options, media, onMediaPick, placeholder }) {
@@ -249,14 +259,14 @@ export default function ContentEditor({ weddingSlug, content }) {
           <legend>Hero photo</legend>
           <div className="content-row__grid">
             <RowField
-              label="Photo" media="hero" value={form.hero.src}
+              label={photoLabel('hero')} media="hero" value={form.hero.src}
               onMediaPick={(url, meta) => {
                 setField('hero', 'src', url);
                 if (meta.alt && !form.hero.alt) setField('hero', 'alt', meta.alt);
               }}
             />
             <RowField
-              label={MOBILE_LABEL} media="hero" value={form.hero.mobileSrc}
+              label={mobileLabel('hero')} media="hero" value={form.hero.mobileSrc}
               onMediaPick={(url) => setField('hero', 'mobileSrc', url)}
             />
             <RowField label="Description (for accessibility)" value={form.hero.alt} onChange={(v) => setField('hero', 'alt', v)} />
@@ -275,8 +285,8 @@ export default function ContentEditor({ weddingSlug, content }) {
             { key: 'year', label: 'Year' },
             { key: 'title', label: 'Title' },
             { key: 'text', label: 'Text', textarea: true },
-            { key: 'photo', label: 'Photo', media: 'story', altKey: 'alt' },
-            { key: 'mobilePhoto', label: MOBILE_LABEL, media: 'story' },
+            { key: 'photo', label: photoLabel('story'), media: 'story', altKey: 'alt' },
+            { key: 'mobilePhoto', label: mobileLabel('story'), media: 'story' },
             { key: 'alt', label: 'Photo description' },
           ]}
         />
@@ -290,8 +300,8 @@ export default function ContentEditor({ weddingSlug, content }) {
           blankRow={GALLERY_ROW}
           onChange={(v) => set('gallery', v)}
           fields={[
-            { key: 'src', label: 'Photo', media: 'gallery', altKey: 'alt' },
-            { key: 'mobileSrc', label: MOBILE_LABEL, media: 'gallery' },
+            { key: 'src', label: photoLabel('gallery'), media: 'gallery', altKey: 'alt' },
+            { key: 'mobileSrc', label: mobileLabel('gallery'), media: 'gallery' },
             { key: 'alt', label: 'Description' },
             {
               key: 'span', label: 'Size',
@@ -311,8 +321,8 @@ export default function ContentEditor({ weddingSlug, content }) {
           blankRow={POOL_ROW}
           onChange={(v) => set('galleryPool', v)}
           fields={[
-            { key: 'src', label: 'Photo', media: 'gallery', altKey: 'alt' },
-            { key: 'mobileSrc', label: MOBILE_LABEL, media: 'gallery' },
+            { key: 'src', label: photoLabel('gallery'), media: 'gallery', altKey: 'alt' },
+            { key: 'mobileSrc', label: mobileLabel('gallery'), media: 'gallery' },
             { key: 'alt', label: 'Description' },
           ]}
         />
@@ -353,14 +363,14 @@ export default function ContentEditor({ weddingSlug, content }) {
           <legend>Venue photo</legend>
           <div className="content-row__grid">
             <RowField
-              label="Photo" media="venue" value={form.venuePhoto.src}
+              label={photoLabel('venue')} media="venue" value={form.venuePhoto.src}
               onMediaPick={(url, meta) => {
                 setField('venuePhoto', 'src', url);
                 if (meta.alt && !form.venuePhoto.alt) setField('venuePhoto', 'alt', meta.alt);
               }}
             />
             <RowField
-              label={MOBILE_LABEL} media="venue" value={form.venuePhoto.mobileSrc}
+              label={mobileLabel('venue')} media="venue" value={form.venuePhoto.mobileSrc}
               onMediaPick={(url) => setField('venuePhoto', 'mobileSrc', url)}
             />
             <RowField label="Description" value={form.venuePhoto.alt} onChange={(v) => setField('venuePhoto', 'alt', v)} />

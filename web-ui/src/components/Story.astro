@@ -32,7 +32,7 @@ const title = heading?.title?.trim() || countedTitle(story, weddingYear);
       <figure class="story__media">
         {story.map((chapter, i) => (
           <picture style="display:contents">
-            {chapter.mobilePhoto && <source media="(max-width: 768px)" srcset={chapter.mobilePhoto} />}
+            {chapter.mobilePhoto && <source media="(max-width: 780px)" srcset={chapter.mobilePhoto} />}
             <img
               src={chapter.photo}
               alt={chapter.alt}
