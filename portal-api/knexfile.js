@@ -9,6 +9,9 @@ const config = {
     database: process.env.DB_NAME,
     user: process.env.DB_USER,
     password: process.env.DB_PASSWORD,
+    // The portal's datetime-local input sends wall-clock times with no
+    // offset; read them as Sri Lankan time, not the server's UTC.
+    options: '-c TimeZone=Asia/Colombo',
   },
   pool: { min: 0, max: 10 },
   migrations: {
