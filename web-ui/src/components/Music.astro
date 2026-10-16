@@ -192,6 +192,9 @@ const track = (music?.track || '').trim();
     };
 
     const start = () => {
+      // Framed = a preview on the landing page's laptop and phone. Two
+      // copies of the song starting at once would be noise, not a demo.
+      if (window.top !== window.self) return;
       if (started || !audio.paused) return;
       started = true;
 

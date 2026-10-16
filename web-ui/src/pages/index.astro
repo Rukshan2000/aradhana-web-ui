@@ -119,9 +119,10 @@ const details = [
                   <span class="browser__dots" aria-hidden="true"><i></i><i></i><i></i></span>
                   <span class="browser__url">guestbook.kwingsmedia.com/tharu-sithika/<b>the-fernandos</b></span>
                 </div>
+                <!-- Live, scrollable /demo at a real desktop width, scaled down
+                     into the screen. The screenshot is the poster while it loads. -->
                 <div class="browser__view" data-curtain data-wipe="up">
-                  <img src="/assets/shots/desk-hero.jpg" alt="The invitation page open on a laptop"
-                       width="2880" height="1800" loading="eager" decoding="async" />
+                  <iframe src="/demo" title="The sample invitation on a laptop" tabindex="-1"></iframe>
                 </div>
               </div>
             </div>
@@ -134,9 +135,8 @@ const details = [
           </div>
           <div class="device device-iphone-14-pro device-black devices__phone">
             <div class="device-frame">
-              <img class="device-screen" src="/assets/shots/phone-hero.jpg"
-                   alt="The same invitation open on a phone"
-                   width="800" height="1720" loading="eager" decoding="async" />
+              <iframe class="device-screen" src="/demo" title="The sample invitation on a phone"
+                      tabindex="-1"></iframe>
             </div>
             <div class="device-stripe"></div>
             <div class="device-header"></div>
@@ -433,8 +433,27 @@ const details = [
   .devices__stage > .device { position: absolute; transform-origin: 0 0; }
   .devices__laptop { left: 0; top: 0; transform: scale(1.15); }
   .devices__phone { left: 699px; top: 132px; transform: scale(0.47); z-index: 2; }
-  .devices__phone .device-screen { object-position: top center; }
-  .browser__view { flex: 1; min-height: 0; aspect-ratio: auto; }
+  .devices iframe { border: 0; background: #2c2620; }
+  .devices__phone .device-screen { background: #2c2620 url('/assets/shots/phone-hero.jpg') top / cover; }
+  .browser__view {
+    position: relative;
+    flex: 1;
+    min-height: 0;
+    aspect-ratio: auto;
+    overflow: hidden;
+    background: url('/assets/shots/desk-hero.jpg') top / cover;
+  }
+  /* 240% wide is ~1430px — the desktop layout, not a squeezed tablet one. */
+  .browser__view iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 240%;
+    height: 240%;
+    transform: scale(calc(1 / 2.4));
+    transform-origin: 0 0;
+    background: transparent;
+  }
   /* On a phone the phone is the device that matters: bigger, in front. */
   @media (max-width: 600px) {
     .devices__phone { left: 640px; top: 2px; transform: scale(0.6); }
