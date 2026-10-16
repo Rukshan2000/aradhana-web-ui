@@ -15,6 +15,9 @@ export const prerender = false;
 
 const signIn = portalUrl('/login');
 
+// Must match TEMPLATES in layouts/Invite.astro.
+const templates = [['classic', 'Classic'], ['modern', 'Modern'], ['notebook', 'Notebook']];
+
 const surfaces = [
   {
     n: '01',
@@ -109,6 +112,11 @@ const details = [
       <!-- The page selling itself: actual frames of /demo on a laptop and a
            phone, so it reads as one website on both, not a stock photograph.
            Frames are devices.css (MIT), trimmed into src/styles/devices.css. -->
+      <div class="templates" role="group" aria-label="Preview a template" data-reveal="up">
+        {templates.map(([id, label], i) => (
+          <button type="button" data-template={id} aria-pressed={i === 0 ? 'true' : 'false'}>{label}</button>
+        ))}
+      </div>
       <div class="devices" data-reveal="up">
         <div class="devices__stage">
           <div class="device device-macbook-pro device-spacegray devices__laptop">
@@ -300,6 +308,18 @@ const details = [
       </span>
     </div>
   </footer>
+  <script>
+    // Point both device previews at the chosen template.
+    const buttons = document.querySelectorAll<HTMLButtonElement>('.templates button');
+    buttons.forEach((btn) =>
+      btn.addEventListener('click', () => {
+        buttons.forEach((b) => b.setAttribute('aria-pressed', String(b === btn)));
+        document.querySelectorAll<HTMLIFrameElement>('.devices iframe').forEach((f) => {
+          f.src = `/demo?template=${btn.dataset.template}`;
+        });
+      })
+    );
+  </script>
 </Base>
 
 <style>
@@ -407,6 +427,30 @@ const details = [
     background: var(--ivory);
   }
 
+  .templates {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: clamp(2.5rem, 6vw, 4rem);
+  }
+  .templates button {
+    padding: 0.5rem 1.2rem;
+    border: 1px solid rgba(176, 141, 79, 0.5);
+    border-radius: 999px;
+    background: transparent;
+    color: var(--ink);
+    font: inherit;
+    font-size: 0.75rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    cursor: pointer;
+  }
+  .templates button:hover { border-color: var(--gold); color: var(--gold); }
+  .templates button[aria-pressed='true'] { background: var(--gold); border-color: var(--gold); color: var(--ivory); }
+
   /* ── Laptop + phone ───────────────────────────────────────────
      devices.css draws fixed-pixel frames (MacBook 740×434, iPhone 428×868),
      so they are laid out on a fixed 900×540 stage and the whole stage is
@@ -418,7 +462,7 @@ const details = [
     container-type: inline-size;
     max-width: 900px;
     aspect-ratio: 900 / 540;
-    margin: clamp(2.5rem, 6vw, 4.5rem) auto 0;
+    margin: 1.75rem auto 0;
     text-align: left;
   }
   .devices__stage {

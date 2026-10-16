@@ -11,7 +11,13 @@
    A static route wins over the `[wedding]` dynamic one in Astro, so this
    never shadows a real wedding unless a couple's slug is literally "demo". */
 import Invite from '../layouts/Invite.astro';
+import { couple } from '../data/wedding.js';
 
 export const prerender = false;
+
+/* `?template=modern` shows the same sample in another template — the landing
+   page's device previews switch between them. Unknown ids fall back to
+   classic in Invite. */
+const templateId = Astro.url.searchParams.get('template') || couple.templateId;
 ---
-<Invite />
+<Invite couple={{ ...couple, templateId }} />
