@@ -1,4 +1,4 @@
-/* Shared frame for /login and /register: a decorative brand panel plus
+/* Shared frame for the sign-in pages: a decorative brand panel plus
    whatever form the page provides. Kept separate from the pages themselves
    so Login/Register stay focused on their own field logic. */
 export function AuthLayout({ eyebrow, title, subtitle, children }) {

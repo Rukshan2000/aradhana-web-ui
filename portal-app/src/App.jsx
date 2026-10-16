@@ -9,7 +9,6 @@ import Events from './pages/Events.jsx';
 import Images from './pages/Images.jsx';
 import Profile from './pages/Profile.jsx';
 import Login from './pages/Login.jsx';
-import Register from './pages/Register.jsx';
 import ForgotPassword from './pages/ForgotPassword.jsx';
 import HealthBadge from './components/HealthBadge.jsx';
 import { useAuth } from './lib/AuthContext.jsx';
@@ -95,7 +94,7 @@ export default function App() {
   return (
     <Routes>
       <Route path="/login" element={<Login />} />
-      <Route path="/register" element={<Register />} />
+      <Route path="/register" element={<Navigate to="/login" replace />} />
       <Route path="/forgot-password" element={<ForgotPassword />} />
       <Route
         path="/*"

@@ -109,7 +109,6 @@ export default function Login() {
           <button className="auth-submit" disabled={busy}>
             <span>{busy ? 'Signing in…' : 'Sign in'}</span>
           </button>
-          <p className="auth-switch">No account yet? <Link to="/register">Request access</Link></p>
         </form>
       ) : !codeSent ? (
         <form className="auth-form" onSubmit={sendCode}>
@@ -119,7 +118,6 @@ export default function Login() {
           <button className="auth-submit" disabled={busy}>
             <span>{busy ? 'Sending…' : 'Email me a code'}</span>
           </button>
-          <p className="auth-switch">No account yet? <Link to="/register">Request access</Link></p>
         </form>
       ) : (
         <form className="auth-form" onSubmit={submitCode}>

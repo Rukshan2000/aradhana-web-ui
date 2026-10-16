@@ -23,26 +23,8 @@ function requireMail(res) {
   return false;
 }
 
-/**
- * Register a portal account. Open sign-up: anyone who reaches /register can
- * create an account and gets full access to every wedding/guest immediately.
- */
-router.post('/register', async (req, res) => {
-  const { email, password, name } = req.body;
-  if (!email || !EMAIL_RE.test(email)) return res.status(400).json({ error: 'a valid email is required' });
-  if (!password || password.length < 8) return res.status(400).json({ error: 'password must be at least 8 characters' });
-  if (!name) return res.status(400).json({ error: 'name is required' });
-
-  const existing = await db('users').where({ email: email.toLowerCase() }).first();
-  if (existing) return res.status(409).json({ error: 'an account with that email already exists' });
-
-  const [user] = await db('users')
-    .insert({ email: email.toLowerCase(), password_hash: await hashPassword(password), name })
-    .returning('*');
-
-  issueSession(res, user);
-  res.status(201).json(publicUser(user));
-});
+/* No self sign-up: accounts are created by us on the server with
+   `npm run create-user` (scripts/create-user.js). */
 
 router.post('/login', async (req, res) => {
   const { email, password } = req.body;

@@ -64,7 +64,6 @@ export const api = {
   auth: {
     me: () => request('/api/auth/me'),
     login: (email, password) => request('/api/auth/login', { method: 'POST', body: json({ email, password }) }),
-    register: (fields) => request('/api/auth/register', { method: 'POST', body: json(fields) }),
     logout: () => request('/api/auth/logout', { method: 'POST' }),
     // Passwordless sign-in: request a 6-digit code, then trade it for a session.
     requestLoginCode: (email) => request('/api/auth/login/code', { method: 'POST', body: json({ email }) }),

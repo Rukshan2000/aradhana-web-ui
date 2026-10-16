@@ -14,7 +14,6 @@ import '../styles/devices.css';
 export const prerender = false;
 
 const signIn = portalUrl('/login');
-const signUp = portalUrl('/register');
 
 const surfaces = [
   {
@@ -98,7 +97,7 @@ const details = [
           are still deciding on the cake.
         </p>
         <div class="cta" data-reveal="up">
-          <a class="btn btn--solid" href={signUp}>Build your invitation</a>
+          <a class="btn btn--solid" href={signIn}>Sign in</a>
           <a class="btn btn--line" href="/demo">See a finished one</a>
         </div>
         <p class="lead__note" data-reveal="up">
@@ -283,8 +282,7 @@ const details = [
           else can follow while the page is already live.
         </p>
         <div class="cta cta--center" data-reveal="up">
-          <a class="btn btn--solid" href={signUp}>Start your wedding</a>
-          <a class="btn btn--line" href={signIn}>I already have an account</a>
+          <a class="btn btn--solid" href={signIn}>Sign in</a>
         </div>
       </div>
     </section>
