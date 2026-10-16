@@ -9,6 +9,7 @@
    ever sees a slug. */
 import Base from '../layouts/Base.astro';
 import { portalUrl } from '../lib/portal.js';
+import '../styles/devices.css';
 
 export const prerender = false;
 
@@ -106,18 +107,46 @@ const details = [
       </div>
       <div class="lead__glow" aria-hidden="true"></div>
 
-      <!-- The page selling itself: an actual frame of /demo, in a browser
-           chrome so it reads as a website rather than a stock photograph. -->
-      <figure class="browser" data-reveal="up">
-        <div class="browser__bar">
-          <span class="browser__dots" aria-hidden="true"><i></i><i></i><i></i></span>
-          <span class="browser__url">guestbook.kwingsmedia.com/tharu-sithika/<b>the-fernandos</b></span>
+      <!-- The page selling itself: actual frames of /demo on a laptop and a
+           phone, so it reads as one website on both, not a stock photograph.
+           Frames are devices.css (MIT), trimmed into src/styles/devices.css. -->
+      <div class="devices" data-reveal="up">
+        <div class="devices__stage">
+          <div class="device device-macbook-pro device-spacegray devices__laptop">
+            <div class="device-frame">
+              <div class="device-screen browser">
+                <div class="browser__bar">
+                  <span class="browser__dots" aria-hidden="true"><i></i><i></i><i></i></span>
+                  <span class="browser__url">guestbook.kwingsmedia.com/tharu-sithika/<b>the-fernandos</b></span>
+                </div>
+                <div class="browser__view" data-curtain data-wipe="up">
+                  <img src="/assets/shots/desk-hero.jpg" alt="The invitation page open on a laptop"
+                       width="2880" height="1800" loading="eager" decoding="async" />
+                </div>
+              </div>
+            </div>
+            <div class="device-stripe"></div>
+            <div class="device-header"></div>
+            <div class="device-sensors"></div>
+            <div class="device-btns"></div>
+            <div class="device-power"></div>
+            <div class="device-home"></div>
+          </div>
+          <div class="device device-iphone-14-pro device-black devices__phone">
+            <div class="device-frame">
+              <img class="device-screen" src="/assets/shots/phone-hero.jpg"
+                   alt="The same invitation open on a phone"
+                   width="800" height="1720" loading="eager" decoding="async" />
+            </div>
+            <div class="device-stripe"></div>
+            <div class="device-header"></div>
+            <div class="device-sensors"></div>
+            <div class="device-btns"></div>
+            <div class="device-power"></div>
+            <div class="device-home"></div>
+          </div>
         </div>
-        <div class="browser__view" data-curtain data-wipe="up">
-          <img src="/assets/shots/desk-hero.jpg" alt="The invitation page open on a desktop browser"
-               width="2880" height="1800" loading="eager" decoding="async" />
-        </div>
-      </figure>
+      </div>
     </section>
 
     <div class="ornament" aria-hidden="true">✦</div>
@@ -374,15 +403,41 @@ const details = [
      A real screenshot needs a frame, or it reads as a background image.
      The chrome is drawn, not another image, so it stays crisp at any size. */
   .browser {
-    position: relative;
-    z-index: 1;
-    margin: clamp(2.5rem, 6vw, 4.5rem) auto 0;
-    max-width: 1000px;
-    border: 1px solid rgba(176, 141, 79, 0.35);
-    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
     overflow: hidden;
     background: var(--ivory);
-    box-shadow: 0 40px 90px -40px rgba(34, 29, 23, 0.45);
+  }
+
+  /* ── Laptop + phone ───────────────────────────────────────────
+     devices.css draws fixed-pixel frames (MacBook 740×434, iPhone 428×868),
+     so they are laid out on a fixed 900×540 stage and the whole stage is
+     scaled to the column. tan(atan2(a, b)) is a / b as a plain number — the
+     one way CSS can turn "container width over 900px" into a scale factor. */
+  .devices {
+    position: relative;
+    z-index: 1;
+    container-type: inline-size;
+    max-width: 900px;
+    aspect-ratio: 900 / 540;
+    margin: clamp(2.5rem, 6vw, 4.5rem) auto 0;
+    text-align: left;
+  }
+  .devices__stage {
+    position: relative;
+    width: 900px;
+    height: 540px;
+    transform-origin: 0 0;
+    transform: scale(tan(atan2(100cqw, 900px)));
+  }
+  .devices__stage > .device { position: absolute; transform-origin: 0 0; }
+  .devices__laptop { left: 0; top: 0; transform: scale(1.15); }
+  .devices__phone { left: 699px; top: 132px; transform: scale(0.47); z-index: 2; }
+  .devices__phone .device-screen { object-position: top center; }
+  .browser__view { flex: 1; min-height: 0; aspect-ratio: auto; }
+  /* On a phone the phone is the device that matters: bigger, in front. */
+  @media (max-width: 600px) {
+    .devices__phone { left: 640px; top: 2px; transform: scale(0.6); }
   }
   .browser__bar {
     display: flex;
@@ -410,7 +465,7 @@ const details = [
     text-overflow: ellipsis;
     white-space: nowrap;
   }
-  .browser__url b { color: var(--gold); font-weight: 400; }
+  .browser__url b { display: inline; color: var(--gold); font-weight: 400; }
   .browser__view { display: block; aspect-ratio: 16 / 10; }
   .browser__view img { width: 100%; height: 100%; object-fit: cover; object-position: top center; }
 
