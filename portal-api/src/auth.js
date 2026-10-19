@@ -46,4 +46,17 @@ export function requireAuth(req, res, next) {
   next();
 }
 
-export const publicUser = ({ id, email, name, created_at }) => ({ id, email, name, created_at });
+/* Admins may create accounts from the portal's /admin/users page. */
+const ADMIN_EMAILS = (process.env.ADMIN_EMAILS || 'kwingsmedia@gmail.com').toLowerCase().split(',').map((e) => e.trim());
+export const isAdmin = (user) => ADMIN_EMAILS.includes(user.email);
+
+export function requireAdmin(req, res, next) {
+  if (!req.user) return res.status(401).json({ error: 'authentication required' });
+  if (!isAdmin(req.user)) return res.status(403).json({ error: 'admins only' });
+  next();
+}
+
+export const publicUser = (user) => {
+  const { id, email, name, created_at } = user;
+  return { id, email, name, created_at, is_admin: isAdmin(user) };
+};

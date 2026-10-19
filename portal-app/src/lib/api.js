@@ -74,6 +74,8 @@ export const api = {
     // In-session password change: current password stands in for the emailed code.
     changePassword: (fields) => request('/api/auth/password/change', { method: 'POST', body: json(fields) }),
     updateProfile: (fields) => request('/api/auth/me', { method: 'PATCH', body: json(fields) }),
+    // Admins only: create someone else's account (no session is issued).
+    createUser: (fields) => request('/api/auth/users', { method: 'POST', body: json(fields) }),
   },
 
   weddings: {

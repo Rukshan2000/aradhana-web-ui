@@ -8,6 +8,7 @@ import GuestDetail from './pages/GuestDetail.jsx';
 import Events from './pages/Events.jsx';
 import Images from './pages/Images.jsx';
 import Profile from './pages/Profile.jsx';
+import CreateUser from './pages/CreateUser.jsx';
 import Login from './pages/Login.jsx';
 import ForgotPassword from './pages/ForgotPassword.jsx';
 import HealthBadge from './components/HealthBadge.jsx';
@@ -83,6 +84,7 @@ function Shell() {
           <Route path="/events" element={<Events />} />
           <Route path="/images" element={<Images />} />
           <Route path="/profile" element={<Profile />} />
+          <Route path="/admin/users" element={<CreateUser />} />
           <Route path="*" element={<p className="empty">Page not found.</p>} />
         </Routes>
       </main>
