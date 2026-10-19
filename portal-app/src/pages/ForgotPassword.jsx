@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../lib/AuthContext.jsx';
 import { api } from '../lib/api.js';
 import { AuthLayout, Field } from '../components/AuthLayout.jsx';
@@ -10,21 +10,21 @@ import { AuthLayout, Field } from '../components/AuthLayout.jsx';
  * through /login afterwards.
  */
 export default function ForgotPassword() {
+  // Open to signed-in users too: it is how someone who forgot their current
+  // password (e.g. signed in with an email code) sets a new one.
   const { user, resetPassword } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
   const [step, setStep] = useState('request'); // 'request' | 'reset'
   // Carried over from the sign-in form when the user got here from its link.
-  const [email, setEmail] = useState(location.state?.email || '');
+  const [email, setEmail] = useState(location.state?.email || user?.email || '');
   const [code, setCode] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState(null);
   const [notice, setNotice] = useState(null);
-
-  if (user) return <Navigate to="/dashboard" replace />;
 
   async function run(e, action) {
     e.preventDefault();

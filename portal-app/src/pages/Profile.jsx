@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { Page } from '../components/Page.jsx';
 import { useAuth } from '../lib/AuthContext.jsx';
 import Icon from '../components/Icon.jsx';
@@ -118,6 +119,9 @@ export default function Profile() {
             />
           </label>
         </div>
+        <p className="muted">
+          Forgot your current password? <Link to="/forgot-password" state={{ email: user.email }}>Reset it by email</Link>
+        </p>
         {passwordError && <p className="error">{String(passwordError.message)}</p>}
         <div className="content-editor__actions">
           <button className="primary" disabled={savingPassword || !currentPassword || newPassword.length < 8}>
