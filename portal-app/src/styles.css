@@ -35,6 +35,11 @@ body {
   display: flex;
   flex-direction: column;
   gap: 8px;
+  /* Stays in view while the page scrolls, so Sign out is always reachable. */
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
 }
 /* Logo + wordmark. 22px/700 is not only visual: it puts the gold "Book"
    into WCAG's large-text bracket, where 3:1 applies instead of 4.5:1. */
@@ -172,7 +177,7 @@ td a { color: var(--accent); }
 
 @media (max-width: 760px) {
   .shell { flex-direction: column; }
-  .sidebar { width: auto; flex: none; }
+  .sidebar { width: auto; flex: none; position: static; height: auto; }
   .sidebar nav { flex-direction: row; flex-wrap: wrap; }
   .main { padding: 20px 16px; }
 }
