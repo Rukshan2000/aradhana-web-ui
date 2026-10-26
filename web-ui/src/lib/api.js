@@ -121,6 +121,8 @@ export function toCouple(wedding, fallback) {
     venue: wedding.venue ?? fallback.venue ?? null,
     templateId: wedding.template_id ?? fallback.templateId ?? 'classic',
     sampleWishes: wedding.sample_wishes ?? true,
+    // Sections the account's admin switched off, e.g. { gallery: false }.
+    features: wedding.features ?? {},
   };
 }
 

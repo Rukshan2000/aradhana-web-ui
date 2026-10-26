@@ -1,0 +1,84 @@
+---
+import { couple as defaultCouple, guest as fallbackGuest } from '../data/wedding.js';
+/* "Custom 1" gate: a white cover with the card's florals, monogram and
+   names. Same contract as Envelope.astro (data-envelope,
+   data-open-invitation, envelope-lock, invitation:open). */
+const { guest = fallbackGuest, couple = defaultCouple, openInvite = false } = Astro.props;
+---
+<div class="envelope-c1" id="envelope" data-envelope>
+  <img class="envelope-c1__floral envelope-c1__floral--tl" src="/assets/custom1/floral-tl.png" alt="" aria-hidden="true" />
+  <img class="envelope-c1__floral envelope-c1__floral--br" src="/assets/custom1/floral-br.png" alt="" aria-hidden="true" />
+  <div class="envelope-c1__inner">
+    <p class="envelope-c1__to">{openInvite ? 'You are invited' : `For ${guest.name}`}</p>
+    <h1 class="envelope-c1__names">{couple.bride} <i>&</i> {couple.groom}</h1>
+    <p class="envelope-c1__to">{couple.dateLabel}</p>
+    <button type="button" class="envelope-c1__button" data-open-invitation data-open>Open invitation</button>
+  </div>
+</div>
+
+<style>
+  .envelope-c1 {
+    position: fixed;
+    inset: 0;
+    z-index: 200;
+    display: grid;
+    place-items: center;
+    overflow: hidden;
+    background: #fff;
+    text-align: center;
+    font-family: "Cormorant Garamond", Georgia, serif;
+    transition: opacity 0.6s ease, visibility 0.6s;
+  }
+  .envelope-c1::before {
+    content: '';
+    position: absolute;
+    inset: 5% 7%;
+    border: 3px solid transparent;
+    border-image: linear-gradient(90deg, #c9a24a, #f1d58a, #8a6a2a, #e8c56f, #c9a24a) 1;
+  }
+  .envelope-c1__floral { position: absolute; height: auto; width: clamp(8rem, 28vw, 15rem); }
+  .envelope-c1__floral--tl { top: 0; left: 0; }
+  .envelope-c1__floral--br { bottom: 0; right: 0; }
+  .envelope-c1__inner { position: relative; padding: 1.5rem; }
+  .envelope-c1__to { margin: 0; text-transform: uppercase; letter-spacing: 0.15em; font-size: 0.85rem; color: #1d1d1b; }
+  .envelope-c1__names {
+    margin: 1rem 0;
+    font-family: "Alex Brush", cursive;
+    font-weight: 400;
+    font-size: clamp(2.8rem, 11vw, 5rem);
+    line-height: 1.1;
+    color: #3f5a2a;
+  }
+  .envelope-c1__names i { font-style: normal; font-size: 0.6em; }
+  .envelope-c1__button {
+    margin-top: 2rem;
+    font: inherit;
+    font-size: 0.8rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    background: #3f5a2a;
+    color: #fff;
+    border: none;
+    padding: 0.9rem 2.2rem;
+    cursor: pointer;
+  }
+  .envelope-c1.is-open { opacity: 0; visibility: hidden; pointer-events: none; }
+  html.envelope-lock, html.envelope-lock body { overflow: hidden; height: 100%; }
+</style>
+
+<script>
+  const envelope = document.querySelector<HTMLElement>('[data-envelope]');
+  const button = document.querySelector<HTMLButtonElement>('[data-open-invitation]');
+
+  if (envelope && button) {
+    document.documentElement.classList.add('envelope-lock');
+    button.addEventListener('click', () => {
+      button.disabled = true;
+      window.dispatchEvent(new CustomEvent('invitation:open'));
+      document.documentElement.classList.remove('envelope-lock');
+      envelope.classList.add('is-open');
+      window.scrollTo(0, 0);
+      window.setTimeout(() => envelope.remove(), 650);
+    });
+  }
+</script>

@@ -1,6 +1,6 @@
 import { asyncRouter } from '../asyncRouter.js';
 import { db } from '../db.js';
-import { hashPassword, verifyPassword, issueSession, clearSession, requireAuth, requireAdmin, publicUser } from '../auth.js';
+import { hashPassword, verifyPassword, issueSession, clearSession, requireAuth, requireAdmin, publicUser, pickFeatures } from '../auth.js';
 import { issueCode, consumeCode, CODE_TTL_MINUTES } from '../otp.js';
 import { mailEnabled } from '../mailer.js';
 
@@ -26,7 +26,7 @@ function requireMail(res) {
 /* No self sign-up: admins create accounts from the portal's /admin/users
    page, or on the server with `npm run create-user`. */
 router.post('/users', requireAdmin, async (req, res) => {
-  const { email, password, name } = req.body;
+  const { email, password, name, features } = req.body;
   if (!email || !EMAIL_RE.test(email)) return res.status(400).json({ error: 'a valid email is required' });
   if (!password || password.length < 8) return res.status(400).json({ error: 'password must be at least 8 characters' });
   if (!name || !String(name).trim()) return res.status(400).json({ error: 'name is required' });
@@ -34,7 +34,13 @@ router.post('/users', requireAdmin, async (req, res) => {
   if (await findByEmail(email)) return res.status(409).json({ error: 'an account with that email already exists' });
 
   const [user] = await db('users')
-    .insert({ email: email.toLowerCase(), password_hash: await hashPassword(password), name: String(name).trim() })
+    .insert({
+      email: email.toLowerCase(),
+      password_hash: await hashPassword(password),
+      name: String(name).trim(),
+      // jsonb needs the value pre-serialized, as with weddings.content
+      features: JSON.stringify(pickFeatures(features)),
+    })
     .returning('*');
   res.status(201).json(publicUser(user));
 });

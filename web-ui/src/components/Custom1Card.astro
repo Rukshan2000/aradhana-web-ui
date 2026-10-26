@@ -1,0 +1,130 @@
+---
+import { couple as defaultCouple, details as defaultDetails } from '../data/wedding.js';
+/* "Custom 1": the printed card — gold frame, green florals in two corners,
+   monogram, script names and the split date line. Shared by the gate and
+   the hero so both show the same stationery; the slot carries whatever
+   sits under the venue (the gate's button, nothing on the hero). */
+const { couple = defaultCouple, details = defaultDetails, eyebrow = 'Together with their families', addressee } = Astro.props;
+const d = new Date(couple.date);
+const part = (o) => new Intl.DateTimeFormat('en-GB', { timeZone: 'Asia/Colombo', ...o }).format(d);
+const venue = details?.[0];
+---
+<div class="c1-card">
+  <img class="c1-card__floral c1-card__floral--tl" src="/assets/custom1/floral-tl.png" alt="" aria-hidden="true" />
+  <img class="c1-card__floral c1-card__floral--br" src="/assets/custom1/floral-br.png" alt="" aria-hidden="true" />
+  <div class="c1-card__body">
+    <div class="c1-card__mono" aria-hidden="true">
+      <span>{couple.bride?.[0]}</span><i>&</i><span>{couple.groom?.[0]}</span>
+    </div>
+    <p class="c1-card__caps">{eyebrow}</p>
+    <p class="c1-card__caps">Request the honour of the presence of</p>
+    <p class="c1-card__guest">{addressee || ' '}</p>
+    <p class="c1-card__caps">To celebrate the wedding ceremony of their children</p>
+    <h1 class="c1-card__names">{couple.bride} <i>&</i> {couple.groom}</h1>
+    <p class="c1-card__caps">On {part({ weekday: 'long' })}</p>
+    <div class="c1-card__date">
+      <span>{part({ month: 'long' })}</span>
+      <b>{part({ day: 'numeric' })}</b>
+      <span>{part({ year: 'numeric' })}</span>
+    </div>
+    {venue?.time && <p class="c1-card__caps">From {venue.time}</p>}
+    <p class="c1-card__caps c1-card__at">At</p>
+    <p class="c1-card__venue">{venue?.venue || couple.city}</p>
+    {venue?.address && <p class="c1-card__caps">{venue.address}</p>}
+    <slot />
+  </div>
+</div>
+
+<style>
+  .c1-card {
+    position: relative;
+    width: min(100%, 44rem);
+    margin: 0 auto;
+    background: #fff;
+    color: #1d1d1b;
+    font-family: "Cormorant Garamond", Georgia, serif;
+    text-align: center;
+    font-variant-numeric: lining-nums;
+    padding: clamp(4rem, 12vw, 6rem) calc(6% + clamp(0.75rem, 4vw, 3rem));
+  }
+  /* The gold frame, broken at the two floral corners like the print. */
+  .c1-card::before {
+    content: '';
+    position: absolute;
+    inset: 4% 6%;
+    border: 3px solid transparent;
+    border-image: linear-gradient(90deg, #c9a24a, #f1d58a, #8a6a2a, #e8c56f, #c9a24a) 1;
+    pointer-events: none;
+  }
+  .c1-card__floral { position: absolute; pointer-events: none; z-index: 1; height: auto; }
+  .c1-card__floral--tl { top: 0; left: 0; width: clamp(4.5rem, 22%, 12rem); }
+  .c1-card__floral--br { bottom: 0; right: 0; width: clamp(4.5rem, 20%, 11rem); }
+  .c1-card__body { position: relative; z-index: 2; display: flex; flex-direction: column; align-items: center; gap: 0.35rem; }
+
+  .c1-card__mono {
+    position: relative;
+    display: flex;
+    align-items: center;
+    margin-bottom: 1rem;
+    font-size: clamp(2.6rem, 8vw, 3.6rem);
+    line-height: 1;
+    color: #3f5a2a;
+  }
+  .c1-card__mono::after {
+    content: '';
+    position: absolute;
+    inset: -0.25em -0.35em;
+    border: 1px solid #3f5a2a;
+    border-radius: 50%;
+    clip-path: polygon(30% 0, 100% 0, 100% 100%, 60% 100%);
+  }
+  .c1-card__mono i { font-family: "Alex Brush", cursive; font-style: normal; margin: 0 -0.1em; }
+  .c1-card__mono span:last-child { transform: translateY(0.35em); }
+
+  .c1-card__caps {
+    margin: 0;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    font-size: clamp(0.78rem, 2.4vw, 1.1rem);
+    line-height: 1.9;
+  }
+  .c1-card__guest {
+    align-self: stretch;
+    margin: 1.4rem 0 0.4rem;
+    border-bottom: 2px dotted #1d1d1b;
+    font-size: clamp(1.1rem, 3vw, 1.4rem);
+  }
+  .c1-card__names {
+    margin: 1.5rem 0 1.2rem;
+    font-family: "Alex Brush", cursive;
+    font-weight: 400;
+    font-size: clamp(2.6rem, 10vw, 4.6rem);
+    line-height: 1.1;
+    color: #3f5a2a;
+    text-transform: none;
+    letter-spacing: 0;
+  }
+  .c1-card__names i { font-size: 0.6em; font-style: normal; margin: 0 0.15em; }
+  .c1-card__date {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    gap: 0.6rem;
+    width: min(100%, 24rem);
+  }
+  .c1-card__date span {
+    border-block: 2px solid #1d1d1b;
+    padding: 0.3rem 0;
+    text-transform: uppercase;
+    font-size: clamp(1rem, 3vw, 1.35rem);
+  }
+  .c1-card__date b { font-weight: 400; font-size: clamp(3.2rem, 11vw, 4.8rem); line-height: 1; }
+  .c1-card__at { margin-top: 1.2rem; }
+  .c1-card__venue {
+    margin: 0.4rem 0 0;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: clamp(1.4rem, 5vw, 2.3rem);
+    line-height: 1.15;
+  }
+</style>

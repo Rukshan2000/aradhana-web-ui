@@ -1,6 +1,6 @@
 ---
 import { couple as defaultCouple } from '../data/wedding.js';
-const { couple = defaultCouple } = Astro.props;
+const { couple = defaultCouple, on = () => true } = Astro.props;
 
 /* The studio credit is ours and does not vary by wedding, so it is fixed
    here rather than being one more thing to fill in per site. */
@@ -17,8 +17,8 @@ const STUDIO = { label: 'Kwings Media', url: 'https://www.kwingsmedia.com', site
     </p>
     <nav class="footer__nav" data-reveal="left" style="--reveal-delay:400ms">
       <a href="#invitation">Invitation</a>
-      <a href="#story">Story</a>
-      <a href="#gallery">Gallery</a>
+      {on('story') && <a href="#story">Story</a>}
+      {on('gallery') && <a href="#gallery">Gallery</a>}
       <a href="#details">Details</a>
       <a href="#rsvp">RSVP</a>
     </nav>

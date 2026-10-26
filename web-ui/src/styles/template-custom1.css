@@ -1,0 +1,236 @@
+/* ── "Custom 1" template ──────────────────────────────────────────
+   A stack of printed cards on a soft sage table. Every section's
+   content sits on its own white card with the gold frame and green
+   florals of the main invitation (Custom1Card.astro), and each shared
+   section is redrawn in the card's printed idiom: caps serif, green
+   script, ruled lines and dotted write-in lines instead of boxes.
+   Scoped to body[data-template="custom1"].
+
+   `!important` beats Astro's component-scoped styles, as in the other
+   template skins. */
+body[data-template="custom1"] {
+  --table: #eef2e8;
+  --ivory: #ffffff;
+  --ivory-deep: #ffffff;
+  --ink: #1d1d1b;
+  --ink-soft: #4b5145;
+  --gold: #3f5a2a;
+  --gold-light: #c9a24a;
+  --blush: #e4ecdc;
+  --sage: #6f8a5a;
+
+  --font-display: "Cormorant Garamond", Georgia, serif;
+  --font-body: "Cormorant Garamond", Georgia, serif;
+  --font-script: "Alex Brush", cursive;
+
+  --c1-frame: linear-gradient(90deg, #c9a24a, #f1d58a, #8a6a2a, #e8c56f, #c9a24a);
+  --c1-floral: clamp(4rem, 13vw, 8rem);
+  --rule: none;
+  background: #fff !important;
+  font-variant-numeric: lining-nums;
+}
+
+/* ── Strip classic's ornaments ──────────────────────────────────── */
+body[data-template="custom1"]::before,
+body[data-template="custom1"]::after,
+body[data-template="custom1"] .section + .section::before,
+body[data-template="custom1"] .section > .wrap::before,
+body[data-template="custom1"] .section > .wrap::after,
+body[data-template="custom1"] .eyebrow::before,
+body[data-template="custom1"] .ornament,
+body[data-template="custom1"] .meadow,
+body[data-template="custom1"] .card__corner,
+body[data-template="custom1"] .schedule__rail,
+body[data-template="custom1"] .schedule__marker,
+body[data-template="custom1"] .schedule__dots {
+  content: none !important;
+  display: none !important;
+}
+
+/* ── Sections: transparent, so the table shows between cards ───── */
+body[data-template="custom1"] .section,
+body[data-template="custom1"] .hero-c1 {
+  background: transparent !important;
+  border: none !important;
+  padding: 0 !important;
+}
+
+/* Each section's measure becomes a printed card. */
+body[data-template="custom1"] .section > .wrap,
+body[data-template="custom1"] .section > .narrow {
+  position: relative;
+  max-width: none !important;
+  margin: 0 !important;
+  padding: clamp(4rem, 10vw, 6rem) max(clamp(1.5rem, 7vw, 4rem), calc((100% - 52rem) / 2)) !important;
+  text-align: center !important;
+  background:
+    url("/assets/custom1/floral-tl.png") left top / var(--c1-floral) auto no-repeat,
+    url("/assets/custom1/floral-br.png") right bottom / var(--c1-floral) auto no-repeat,
+    #fff !important;
+}
+/* Alternate the corners card to card so the stack doesn't repeat. */
+body[data-template="custom1"] .section:nth-of-type(even) > .wrap,
+body[data-template="custom1"] .section:nth-of-type(even) > .narrow {
+  background:
+    url("/assets/custom1/floral-br.png") right top / var(--c1-floral) auto no-repeat,
+    url("/assets/custom1/floral-tl.png") left bottom / var(--c1-floral) auto no-repeat,
+    #fff !important;
+}
+/* A second measure in one section (Details' schedule) is its own card. */
+body[data-template="custom1"] .banner { margin: 0 !important; }
+
+/* ── Type: printed caps + green script, as on the card ──────────── */
+body[data-template="custom1"] .eyebrow {
+  color: var(--ink) !important;
+  font-size: 0.85rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+body[data-template="custom1"] h2,
+body[data-template="custom1"] .schedule__title {
+  margin-top: 0.5rem;
+  font-family: var(--font-script) !important;
+  font-weight: 400 !important;
+  font-style: normal !important;
+  font-size: clamp(2.5rem, 8vw, 3.8rem) !important;
+  line-height: 1.15;
+  color: var(--gold) !important;
+  text-transform: none !important;
+  letter-spacing: 0 !important;
+}
+body[data-template="custom1"] .script { color: var(--gold) !important; }
+
+/* ── Countdown: the card's ruled date line, four times ──────────── */
+body[data-template="custom1"] .clock {
+  gap: 0.6rem !important;
+  margin: 2rem auto 0 !important;
+}
+body[data-template="custom1"] .clock__cell {
+  border: none !important;
+  border-block: 2px solid var(--ink) !important;
+  padding: 0.6rem 0 !important;
+}
+body[data-template="custom1"] .clock__value {
+  font-size: clamp(2.2rem, 8vw, 3.4rem) !important;
+  color: var(--ink) !important;
+}
+body[data-template="custom1"] .clock__label { color: var(--ink) !important; letter-spacing: 0.15em; }
+body[data-template="custom1"] .countdown__note { margin-top: 1.5rem; color: var(--gold) !important; }
+
+/* ── Story: photo framed in gold, copy centred under it ─────────── */
+body[data-template="custom1"] .story__card {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+body[data-template="custom1"] .story__media,
+body[data-template="custom1"] .grid img,
+body[data-template="custom1"] .tile__img {
+  border: 6px solid #fff;
+  outline: 1px solid var(--gold-light);
+}
+body[data-template="custom1"] .story__year {
+  font-family: var(--font-script) !important;
+  font-size: 2.4rem !important;
+  color: var(--gold) !important;
+}
+body[data-template="custom1"] .story__body { text-align: center !important; }
+
+/* ── Details: venues as printed blocks, not boxed cards ─────────── */
+body[data-template="custom1"] .card {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  border-bottom: 2px dotted var(--ink) !important;
+  padding-bottom: 1.5rem;
+}
+body[data-template="custom1"] .card:last-child { border-bottom: none !important; }
+body[data-template="custom1"] .card__label { color: var(--ink) !important; letter-spacing: 0.12em; }
+body[data-template="custom1"] .card h3 {
+  font-weight: 600 !important;
+  text-transform: uppercase;
+  font-size: clamp(1.3rem, 4.5vw, 1.8rem) !important;
+}
+body[data-template="custom1"] .card,
+body[data-template="custom1"] .card * { border-color: transparent !important; }
+body[data-template="custom1"] .card__map { filter: saturate(0.4) hue-rotate(40deg); }
+
+/* Schedule: centred printed programme — time in caps, event below. */
+body[data-template="custom1"] .schedule__wrap { padding: 0 !important; }
+body[data-template="custom1"] .schedule__row {
+  display: flex !important;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.15rem;
+  padding: 0.9rem 0 !important;
+  text-align: center;
+  border-bottom: 1px solid rgba(201, 162, 74, 0.5);
+}
+body[data-template="custom1"] .schedule__row:last-child { border-bottom: none; }
+body[data-template="custom1"] .schedule__time { color: var(--gold) !important; letter-spacing: 0.15em; }
+body[data-template="custom1"] .schedule__event { font-size: 1.25rem; text-transform: uppercase; }
+
+/* ── RSVP: fill-in lines like the card's "Mr / Mrs …" line ─────── */
+body[data-template="custom1"] .rsvp input,
+body[data-template="custom1"] .rsvp textarea {
+  background: transparent !important;
+  border: none !important;
+  border-bottom: 2px dotted var(--ink) !important;
+  border-radius: 0 !important;
+  text-align: center;
+  font-size: 1.15rem;
+}
+body[data-template="custom1"] .rsvp label,
+body[data-template="custom1"] .field > span { color: var(--ink) !important; }
+body[data-template="custom1"] .choice__box {
+  background: #fff !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+body[data-template="custom1"] .choice__option input:checked + .choice__box,
+body[data-template="custom1"] .choice__box:has(input:checked) {
+  border: none !important;
+  background: var(--blush) !important;
+}
+body[data-template="custom1"] .form button[type="submit"] {
+  background: var(--gold) !important;
+  color: #fff !important;
+  border: none !important;
+}
+
+/* ── Wishes: notes on the card, script names ────────────────────── */
+body[data-template="custom1"] .wishes__card {
+  background: #fff !important;
+  border: none !important;
+  box-shadow: none !important;
+  text-align: center;
+}
+body[data-template="custom1"] .wishes__name {
+  font-family: var(--font-script) !important;
+  font-size: 1.6rem !important;
+  text-transform: none !important;
+  letter-spacing: 0 !important;
+  color: var(--gold) !important;
+}
+body[data-template="custom1"] .wishes__arrow { border-color: var(--gold) !important; color: var(--gold) !important; background: #fff !important; }
+
+/* ── Footer: the last card in the stack ─────────────────────────── */
+body[data-template="custom1"] .footer {
+  background: transparent !important;
+  color: var(--ink) !important;
+  padding: 0 !important;
+}
+body[data-template="custom1"] .footer > .narrow {
+  max-width: none;
+  padding: clamp(4rem, 10vw, 6rem) 1.5rem 7rem;
+  background:
+    url("/assets/custom1/floral-tl.png") left top / var(--c1-floral) auto no-repeat,
+    url("/assets/custom1/floral-br.png") right bottom / var(--c1-floral) auto no-repeat,
+    #fff;
+}
+body[data-template="custom1"] .footer__names { color: var(--gold) !important; font-family: var(--font-script) !important; }
+body[data-template="custom1"] .footer__meta,
+body[data-template="custom1"] .footer__nav a,
+body[data-template="custom1"] .footer__credit,
+body[data-template="custom1"] .footer__credit a { color: var(--ink) !important; }
+body[data-template="custom1"] .footer__site { color: var(--gold) !important; }

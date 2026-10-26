@@ -53,6 +53,13 @@ function publicWishes(weddingId) {
     .select('name', 'message');
 }
 
+/** The wedding as the public page sees it: with its owner's feature flags,
+ *  so sections an admin switched off for the account never render. */
+async function withFeatures(wedding) {
+  const owner = wedding.owner_id && (await db('users').where({ id: wedding.owner_id }).first('features'));
+  return { ...wedding, features: owner?.features || {} };
+}
+
 /** Appends -2, -3 … until the guest slug is free inside this wedding. */
 async function uniqueGuestSlug(weddingId, base) {
   const root = base || 'guest';
@@ -396,7 +403,7 @@ router.get('/:weddingSlug/invite', async (req, res) => {
   const wedding = await publishedWedding(req.params.weddingSlug);
   if (!wedding) return res.status(404).json({ error: 'wedding not found' });
   if (wedding.open_revoked_at) return res.status(410).json(GONE);
-  res.json({ wedding, guest: null, open_rsvp: wedding.open_rsvp !== false, wishes: await publicWishes(wedding.id) });
+  res.json({ wedding: await withFeatures(wedding), guest: null, open_rsvp: wedding.open_rsvp !== false, wishes: await publicWishes(wedding.id) });
 });
 
 // Public: the open form posts here. Unlike the personalised RSVP there is no
@@ -504,7 +511,7 @@ router.get('/:weddingSlug/invite/:inviteeSlug', async (req, res) => {
   // existed. Nothing about the guest goes out with it.
   if (guest.revoked_at) return res.status(410).json(GONE);
 
-  res.json({ wedding, guest: publicGuest(guest), wishes: await publicWishes(wedding.id) });
+  res.json({ wedding: await withFeatures(wedding), guest: publicGuest(guest), wishes: await publicWishes(wedding.id) });
 });
 
 // Public: the invitation's own RSVP form posts here. Addressed by the same

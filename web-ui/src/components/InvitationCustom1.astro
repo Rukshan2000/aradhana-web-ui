@@ -1,0 +1,36 @@
+---
+import { couple as defaultCouple, guest as fallbackGuest, headings as defaultHeadings } from '../data/wedding.js';
+/* "Custom 1" invitation: a small enclosure card — script line, a short
+   printed paragraph and the reply prompt. Same props as Invitation.astro. */
+const { guest = fallbackGuest, couple = defaultCouple, openInvite = false, heading = defaultHeadings.invitation } = Astro.props;
+---
+<section class="section invitation-c1" id="invitation">
+  <div class="wrap">
+    <p class="eyebrow" data-reveal>{heading.eyebrow}</p>
+    {!openInvite && <p class="invitation-c1__to" data-reveal>Dear {guest.name}</p>}
+    <h2 data-reveal>{heading.title}</h2>
+    <p class="invitation-c1__body" data-reveal>
+      With joyful hearts, {couple.bride} and {couple.groom} request the honour of your presence
+      as they exchange vows and begin their life together.
+    </p>
+    <p class="invitation-c1__date" data-reveal>{couple.dateLabel}<br />{couple.city}</p>
+    <a class="invitation-c1__cta" href="#rsvp" data-reveal>Kindly reply</a>
+  </div>
+</section>
+
+<style>
+  .invitation-c1 { text-align: center; }
+  .invitation-c1__to { margin: 1rem 0 0; font-size: 1.25rem; font-style: italic; }
+  .invitation-c1__body { max-width: 32em; margin: 1rem auto 1.5rem; font-size: 1.15rem; line-height: 1.8; }
+  .invitation-c1__date { margin: 0 0 2rem; text-transform: uppercase; letter-spacing: 0.08em; line-height: 1.9; }
+  .invitation-c1__cta {
+    display: inline-block;
+    padding: 0.85rem 2.2rem;
+    background: var(--gold);
+    color: #fff;
+    text-decoration: none;
+    text-transform: uppercase;
+    letter-spacing: 0.25em;
+    font-size: 0.75rem;
+  }
+</style>

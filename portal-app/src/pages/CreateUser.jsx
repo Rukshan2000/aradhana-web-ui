@@ -4,7 +4,16 @@ import { useAuth } from '../lib/AuthContext.jsx';
 import { api } from '../lib/api.js';
 import Icon from '../components/Icon.jsx';
 
-const blank = { name: '', email: '', password: '' };
+/* Invitation sections this account gets; must match FEATURES in portal-api/src/auth.js. */
+const FEATURES = [
+  ['countdown', 'Countdown — days until the wedding'],
+  ['story', 'Story — the love-story carousel'],
+  ['gallery', 'Photo gallery'],
+  ['wishes', "Wishes — carousel of guests' notes"],
+  ['music', 'Background music'],
+];
+const allOn = Object.fromEntries(FEATURES.map(([key]) => [key, true]));
+const blank = { name: '', email: '', password: '', features: allOn };
 
 /* Internal: admins create portal accounts here (self sign-up is closed).
    Not linked from the sidebar; reach it at /admin/users. */
@@ -16,6 +25,7 @@ export default function CreateUser() {
   const [created, setCreated] = useState(null);
 
   const set = (key) => (e) => setForm({ ...form, [key]: e.target.value });
+  const toggle = (key) => (e) => setForm({ ...form, features: { ...form.features, [key]: e.target.checked } });
 
   async function submit(e) {
     e.preventDefault();
@@ -50,6 +60,15 @@ export default function CreateUser() {
             Password
             <input type="text" value={form.password} required minLength={8} autoComplete="new-password" onChange={set('password')} />
           </label>
+        </div>
+        <p>Features on the invitation</p>
+        <div className="grid">
+          {FEATURES.map(([key, label]) => (
+            <label key={key} className="checkbox">
+              <input type="checkbox" checked={form.features[key]} onChange={toggle(key)} />
+              {label}
+            </label>
+          ))}
         </div>
         {error && <p className="error">{String(error.message)}</p>}
         <div className="content-editor__actions">

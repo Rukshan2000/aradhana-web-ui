@@ -150,6 +150,7 @@ export default function WeddingDetailsEditor({ weddingSlug, wedding, onSaved }) 
                 <option value="classic">Classic</option>
                 <option value="modern">Modern</option>
                 <option value="notebook">Notebook</option>
+                <option value="custom1">Custom 1</option>
               </select>
             </label>
           </div>
