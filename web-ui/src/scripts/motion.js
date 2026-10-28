@@ -375,10 +375,10 @@ if (form) {
       name: (data.get('name') || '').trim(),
       attending: data.get('attending'),
       note: data.get('note') || '',
+      attending_count: Number(data.get('attending_count')) || 1,
     };
     if (isOpen) {
       payload.phone = (data.get('phone') || '').trim();
-      payload.attending_count = Number(data.get('attending_count')) || 1;
       payload.side = data.get('side') || '';
 
       const missing = !payload.name ? 'name' : !payload.phone ? 'phone' : !payload.side ? 'side' : null;
