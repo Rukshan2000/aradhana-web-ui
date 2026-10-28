@@ -147,7 +147,8 @@ export function mergeContent(content, fallback) {
     gallery: c.gallery ?? fallback.gallery,
     galleryPool: c.galleryPool ?? fallback.galleryPool,
     details: c.details ?? fallback.details,
-    schedule: c.schedule ?? fallback.schedule,
+    // A hidden schedule keeps its stops in the portal; the page just skips it.
+    schedule: c.scheduleHidden ? [] : c.schedule ?? fallback.schedule,
     venuePhoto: c.venuePhoto ?? fallback.venuePhoto,
     music: c.music ?? fallback.music,
   };

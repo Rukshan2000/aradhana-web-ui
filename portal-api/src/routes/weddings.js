@@ -104,6 +104,7 @@ function sanitizeContent(content) {
     const v = content[key];
     if (v && typeof v === 'object' && !Array.isArray(v)) out[key] = v;
   }
+  if (content.scheduleHidden === true) out.scheduleHidden = true;
   return out;
 }
 

@@ -25,6 +25,7 @@ const EMPTY_CONTENT = {
   galleryPool: [],
   details: [],
   schedule: [],
+  scheduleHidden: false,
   venuePhoto: { src: '', mobileSrc: '', alt: '' },
   music: { track: '', startAt: 0, endAt: 0, volume: 0.5 },
 };
@@ -189,6 +190,7 @@ export default function ContentEditor({ weddingSlug, content }) {
       galleryPool: content?.galleryPool?.length ? content.galleryPool : [],
       details: content?.details?.length ? content.details : [],
       schedule: content?.schedule?.length ? content.schedule : [],
+      scheduleHidden: !!content?.scheduleHidden,
       venuePhoto: { ...EMPTY_CONTENT.venuePhoto, ...content?.venuePhoto },
       music: { ...EMPTY_CONTENT.music, ...content?.music },
     });
@@ -344,6 +346,11 @@ export default function ContentEditor({ weddingSlug, content }) {
             { key: 'note', label: 'Note', textarea: true },
           ]}
         />
+
+        <label className="checkbox">
+          <input type="checkbox" checked={!form.scheduleHidden} onChange={(e) => set('scheduleHidden', !e.target.checked)} />
+          Show "Order of the evening" on the invitation
+        </label>
 
         <RepeatableList
           title="Schedule"
