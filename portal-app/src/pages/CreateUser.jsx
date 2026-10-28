@@ -9,6 +9,7 @@ const FEATURES = [
   ['countdown', 'Countdown — days until the wedding'],
   ['story', 'Story — the love-story carousel'],
   ['gallery', 'Photo gallery'],
+  ['schedule', "Order of the evening — the day's schedule"],
   ['wishes', "Wishes — carousel of guests' notes"],
   ['music', 'Background music'],
 ];

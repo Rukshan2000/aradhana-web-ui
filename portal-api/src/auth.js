@@ -58,7 +58,7 @@ export function requireAdmin(req, res, next) {
 
 /* Invitation sections an admin can switch off per account. Only `false`
    values are stored; anything else means the section shows. */
-export const FEATURES = ['countdown', 'story', 'gallery', 'wishes', 'music'];
+export const FEATURES = ['countdown', 'story', 'gallery', 'schedule', 'wishes', 'music'];
 export const pickFeatures = (input) =>
   Object.fromEntries(FEATURES.filter((k) => input?.[k] === false).map((k) => [k, false]));
 

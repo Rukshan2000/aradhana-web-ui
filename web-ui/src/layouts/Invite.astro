@@ -63,7 +63,7 @@ const on = (feature) => couple.features?.[feature] !== false;
   {on('countdown') && <Countdown couple={couple} heading={content.headings.countdown} />}
   {on('story') && <Story story={content.story} heading={content.headings.story} weddingYear={new Date(couple.date).getFullYear()} />}
   {on('gallery') && <Gallery gallery={content.gallery} galleryPool={content.galleryPool} heading={content.headings.gallery} />}
-  <Details details={content.details} schedule={content.schedule} venuePhoto={content.venuePhoto}
+  <Details details={content.details} schedule={on('schedule') ? content.schedule : []} venuePhoto={content.venuePhoto}
     couple={couple} heading={content.headings.details} scheduleHeading={content.headings.schedule} />
   <Rsvp guest={guest} couple={couple} replyBy={replyBy} weddingSlug={weddingSlug} openRsvp={openRsvp}
     closed={rsvpClosed} heading={content.headings.rsvp} />
