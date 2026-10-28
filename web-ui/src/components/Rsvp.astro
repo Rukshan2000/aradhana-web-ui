@@ -6,6 +6,8 @@ import { couple as defaultCouple, guest as fallbackGuest, rsvp, headings as defa
 const { guest = fallbackGuest, couple = defaultCouple, replyBy, weddingSlug, openRsvp = false, closed = false, heading = defaultHeadings.rsvp } = Astro.props;
 const rsvpBy = replyBy || rsvp.replyBy;
 const MAX_SEATS = 10;
+/* A personalised card asks for a head count only when it was given more than one seat. */
+const seats = openRsvp ? MAX_SEATS : Number(guest.max_seats) || 1;
 
 // Same "Add to Google Calendar" template link as Details.astro, built here
 // too so the post-RSVP popup can offer it without that section's props.
@@ -126,15 +128,15 @@ const calendarUrl = (() => {
         </div>
       </fieldset>
 
-      {openRsvp && (
+      {seats > 1 && (
         <label class="field" data-reveal="right">
-          <span>How many attending</span>
+          <span>{openRsvp ? 'How many attending' : `How many attending (up to ${seats})`}</span>
           <input
             type="number"
             name="attending_count"
             required
             min="1"
-            max={MAX_SEATS}
+            max={seats}
             step="1"
             value="1"
             inputmode="numeric"
