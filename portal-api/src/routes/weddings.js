@@ -170,7 +170,7 @@ router.post('/', requireAuth, async (req, res) => {
 router.get('/:weddingSlug', requireAuth, async (req, res) => {
   const wedding = await ownWedding(req, res);
   if (!wedding) return;
-  res.json(wedding);
+  res.json(await withFeatures(wedding));
 });
 
 router.patch('/:weddingSlug', requireAuth, async (req, res) => {

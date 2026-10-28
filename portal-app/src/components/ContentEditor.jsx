@@ -172,7 +172,10 @@ const HEADING_SECTIONS = [
   { key: 'rsvp', label: 'RSVP', eyebrow: 'Répondez s\'il vous plaît', title: 'Will you join us?' },
 ];
 
-export default function ContentEditor({ weddingSlug, content }) {
+export default function ContentEditor({ weddingSlug, content, features }) {
+  /* Sections an admin switched off for this account get no form here either. */
+  const on = (feature) => features?.[feature] !== false;
+  const tabs = TABS.filter((t) => on(t.key));
   const [form, setForm] = useState(EMPTY_CONTENT);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState(null);
@@ -242,7 +245,7 @@ export default function ContentEditor({ weddingSlug, content }) {
       </div>
 
       <div className="content-tabs" role="tablist">
-        {TABS.map((t) => (
+        {tabs.map((t) => (
           <button
             key={t.key}
             type="button"
@@ -347,6 +350,7 @@ export default function ContentEditor({ weddingSlug, content }) {
           ]}
         />
 
+        {on('schedule') && <>
         <label className="checkbox">
           <input type="checkbox" checked={!form.scheduleHidden} onChange={(e) => set('scheduleHidden', !e.target.checked)} />
           Show "Order of the evening" on the invitation
@@ -363,6 +367,7 @@ export default function ContentEditor({ weddingSlug, content }) {
             { key: 'event', label: 'Event' },
           ]}
         />
+        </>}
       </div>
 
       <div className="content-tab-panel" hidden={tab !== 'extras'}>
@@ -384,17 +389,17 @@ export default function ContentEditor({ weddingSlug, content }) {
           </div>
         </fieldset>
 
-        <fieldset className="content-list">
+        {on('music') && <fieldset className="content-list">
           <legend>Background music</legend>
           <MusicPicker value={form.music} onChange={(next) => set('music', next)} />
-        </fieldset>
+        </fieldset>}
       </div>
 
       <div className="content-tab-panel" hidden={tab !== 'wording'}>
         <p className="content-list__hint">
           The words above each section. Leave one blank to keep the wording the site ships with.
         </p>
-        {HEADING_SECTIONS.map((section) => (
+        {HEADING_SECTIONS.filter((section) => on(section.key)).map((section) => (
           <fieldset className="content-list" key={section.key}>
             <legend>{section.label}</legend>
             <div className="content-row__grid">
