@@ -3,10 +3,10 @@ import Custom1Card from './Custom1Card.astro';
 import { couple as defaultCouple, guest as fallbackGuest, headings as defaultHeadings, details as defaultDetails } from '../data/wedding.js';
 /* "Custom 1" hero: the printed card, with the household written on the
    dotted line. Takes Hero.astro's props plus guest/details/openInvite. */
-const { couple = defaultCouple, heading = defaultHeadings.hero, guest = fallbackGuest, details = defaultDetails, openInvite = false } = Astro.props;
+const { couple = defaultCouple, heading = defaultHeadings.hero, guest = fallbackGuest, details = defaultDetails, openInvite = false, card = defaultHeadings.card } = Astro.props;
 ---
 <header class="hero-c1" id="top">
-  <Custom1Card couple={couple} details={details} eyebrow={heading.eyebrow}
+  <Custom1Card couple={couple} details={details} eyebrow={heading.eyebrow} card={card}
     addressee={openInvite ? '' : [guest.name, guest.household].filter(Boolean).join(' ')} />
 </header>
 

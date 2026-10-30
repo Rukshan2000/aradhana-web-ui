@@ -18,6 +18,7 @@ const EMPTY_CONTENT = {
     gallery: { eyebrow: '', title: '' },
     details: { eyebrow: '', title: '' },
     schedule: { title: '' },
+    card: { monogram: '', honour: '', celebrate: '' },
     rsvp: { eyebrow: '', title: '' },
   },
   story: [],
@@ -169,6 +170,13 @@ const HEADING_SECTIONS = [
   { key: 'details', label: 'Day details', eyebrow: 'The day', title: 'When and where' },
   { key: 'schedule', label: 'Schedule', title: 'Order of the evening',
     hint: 'The schedule and its heading are hidden entirely while there are no stops.' },
+  { key: 'card', label: 'Custom 1 card (top of the invitation)',
+    fields: [
+      { key: 'monogram', label: 'Monogram', placeholder: 'Couple\'s initials, e.g. S & A' },
+      { key: 'honour', label: 'Line above the guest\'s name', placeholder: 'Request the honour of the presence of' },
+      { key: 'celebrate', label: 'Line above the couple\'s names', placeholder: 'To celebrate the wedding ceremony of their children' },
+    ],
+    hint: 'Only the Custom 1 template prints these. Put "&" in the monogram to split it like the initials.' },
   { key: 'rsvp', label: 'RSVP', eyebrow: 'Répondez s\'il vous plaît', title: 'Will you join us?' },
 ];
 
@@ -419,6 +427,15 @@ export default function ContentEditor({ weddingSlug, content, features }) {
                   onChange={(v) => setHeading(section.key, 'title', v)}
                 />
               )}
+              {section.fields?.map((f) => (
+                <RowField
+                  key={f.key}
+                  label={f.label}
+                  placeholder={f.placeholder}
+                  value={form.headings[section.key][f.key] ?? ''}
+                  onChange={(v) => setHeading(section.key, f.key, v)}
+                />
+              ))}
             </div>
             {section.hint && <p className="content-list__hint">{section.hint}</p>}
           </fieldset>

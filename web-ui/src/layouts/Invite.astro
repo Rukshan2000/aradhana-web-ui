@@ -57,7 +57,7 @@ const on = (feature) => couple.features?.[feature] !== false;
 ---
 <Base title={title} description={description} wedding={weddingSlug} invitee={guest.slug} data-template={templateId}>
   <Gate guest={guest} couple={couple} openInvite={openRsvp} />
-  <Top couple={couple} hero={content.hero} heading={content.headings.hero}
+  <Top couple={couple} hero={content.hero} heading={content.headings.hero} card={content.headings.card}
     guest={guest} details={content.details} openInvite={openRsvp} />
   <Note guest={guest} couple={couple} openInvite={openRsvp} heading={content.headings.invitation} />
   {on('countdown') && <Countdown couple={couple} heading={content.headings.countdown} />}

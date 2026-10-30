@@ -41,6 +41,11 @@
     "schedule": {
       "title": "Order of the evening"
     },
+    "card": {
+      "monogram": "",
+      "honour": "Request the honour of the presence of",
+      "celebrate": "To celebrate the wedding ceremony of their children"
+    },
     "rsvp": {
       "eyebrow": "Répondez s’il vous plaît",
       "title": "Will you join us?"

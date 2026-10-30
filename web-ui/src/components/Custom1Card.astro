@@ -1,10 +1,13 @@
 ---
-import { couple as defaultCouple, details as defaultDetails } from '../data/wedding.js';
+import { couple as defaultCouple, details as defaultDetails, headings as defaultHeadings } from '../data/wedding.js';
 /* "Custom 1": the printed card — gold frame, green florals in two corners,
    monogram, script names and the split date line. Shared by the gate and
    the hero so both show the same stationery; the slot carries whatever
    sits under the venue (the gate's button, nothing on the hero). */
-const { couple = defaultCouple, details = defaultDetails, eyebrow = 'Together with their families', addressee } = Astro.props;
+const { couple = defaultCouple, details = defaultDetails, eyebrow = 'Together with their families', addressee, card: given } = Astro.props;
+// Blank fields keep the printed wording; a custom monogram splits on "&".
+const card = { ...defaultHeadings.card, ...Object.fromEntries(Object.entries(given || {}).filter(([, v]) => v?.trim())) };
+const mono = card.monogram?.trim() ? card.monogram.split('&').map((s) => s.trim()) : [couple.bride?.[0], couple.groom?.[0]];
 const d = new Date(couple.date);
 const part = (o) => new Intl.DateTimeFormat('en-GB', { timeZone: 'Asia/Colombo', ...o }).format(d);
 const venue = details?.[0];
@@ -14,12 +17,12 @@ const venue = details?.[0];
   <img class="c1-card__floral c1-card__floral--br" src="/assets/custom1/floral-br.png" alt="" aria-hidden="true" />
   <div class="c1-card__body">
     <div class="c1-card__mono" aria-hidden="true">
-      <span>{couple.bride?.[0]}</span><i>&</i><span>{couple.groom?.[0]}</span>
+      {mono.map((part, i) => <>{i > 0 && <i>&</i>}<span>{part}</span></>)}
     </div>
     <p class="c1-card__caps">{eyebrow}</p>
-    <p class="c1-card__caps">Request the honour of the presence of</p>
+    <p class="c1-card__caps">{card.honour}</p>
     <p class="c1-card__guest">{addressee || ' '}</p>
-    <p class="c1-card__caps">To celebrate the wedding ceremony of their children</p>
+    <p class="c1-card__caps">{card.celebrate}</p>
     <h1 class="c1-card__names">{couple.bride} <i>&</i> {couple.groom}</h1>
     <p class="c1-card__caps">On {part({ weekday: 'long' })}</p>
     <div class="c1-card__date">
