@@ -139,8 +139,10 @@ export default function Guests() {
   // cannot correct by re-sending an invitation.
   async function remove(guest) {
     const yes = await confirm({
-      title: `Remove ${guest.name}'s reply?`,
-      body: 'Their reply, head count and phone number are deleted for good. This cannot be undone.',
+      title: tab === 'self' ? `Remove ${guest.name}'s reply?` : `Remove ${guest.name}?`,
+      body: tab === 'self'
+        ? 'Their reply, head count and phone number are deleted for good. This cannot be undone.'
+        : 'The invitee, their reply and their invitation link are deleted for good — the link stops working. This cannot be undone.',
       confirmLabel: 'Remove',
       danger: true,
     });
@@ -365,7 +367,7 @@ export default function Guests() {
           ) : (
             <table>
               <thead>
-                <tr><th>Name</th><th>Side</th><th>RSVP</th><th>Seats</th><th>Opens</th><th>Clicks</th><th>Link</th></tr>
+                <tr><th>Name</th><th>Side</th><th>RSVP</th><th>Seats</th><th>Opens</th><th>Clicks</th><th>Link</th><th></th></tr>
               </thead>
               <tbody>
                 {pager.slice.map((g) => (
@@ -380,6 +382,11 @@ export default function Guests() {
                     <td>{g.open_count}</td>
                     <td>{g.click_count}</td>
                     <td><LinkCell guest={g} busy={revoking === g.slug} onToggle={toggleRevoke} onChanged={reload} /></td>
+                    <td>
+                      <button className="danger" disabled={removing === g.slug} onClick={() => remove(g)}>
+                        <Icon name="trash-can" /> {removing === g.slug ? 'Removing…' : 'Remove'}
+                      </button>
+                    </td>
                   </tr>
                 ))}
               </tbody>

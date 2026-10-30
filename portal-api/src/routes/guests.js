@@ -211,7 +211,11 @@ router.post('/:slug/:action(revoke|restore)', async (req, res) => {
 router.delete('/:slug', async (req, res) => {
   const found = await findOne(req, res);
   if (!found) return;
-  await db('guests').where({ id: found.guest.id }).del();
+  // Its open/click history would otherwise linger as anonymous events.
+  await db.transaction(async (trx) => {
+    await trx('invitation_events').where({ guest_id: found.guest.id }).del();
+    await trx('guests').where({ id: found.guest.id }).del();
+  });
   res.status(204).end();
 });
 
