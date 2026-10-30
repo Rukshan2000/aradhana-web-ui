@@ -99,7 +99,7 @@ export default function WeddingDetail() {
         )}
       </State>
 
-      {w && <ContentEditor weddingSlug={weddingSlug} content={w.content} features={w.features} />}
+      {w && <ContentEditor weddingSlug={weddingSlug} content={w.content} features={w.features} templateId={w.template_id} />}
 
       {form && (
         <form className="card form" onSubmit={submit}>

@@ -176,11 +176,11 @@ const HEADING_SECTIONS = [
       { key: 'honour', label: 'Line above the guest\'s name', placeholder: 'Request the honour of the presence of' },
       { key: 'celebrate', label: 'Line above the couple\'s names', placeholder: 'To celebrate the wedding ceremony of their children' },
     ],
-    hint: 'Only the Custom 1 template prints these. Up to four letters print as a large monogram (put "&" between them, e.g. S & A); anything longer prints as a smaller line.' },
+    hint: 'Up to four letters print as a large monogram (put "&" between them, e.g. S & A); anything longer prints as a smaller line.' },
   { key: 'rsvp', label: 'RSVP', eyebrow: 'Répondez s\'il vous plaît', title: 'Will you join us?' },
 ];
 
-export default function ContentEditor({ weddingSlug, content, features }) {
+export default function ContentEditor({ weddingSlug, content, features, templateId }) {
   /* Sections an admin switched off for this account get no form here either. */
   const on = (feature) => features?.[feature] !== false;
   const tabs = TABS.filter((t) => on(t.key));
@@ -407,7 +407,7 @@ export default function ContentEditor({ weddingSlug, content, features }) {
         <p className="content-list__hint">
           The words above each section. Leave one blank to keep the wording the site ships with.
         </p>
-        {HEADING_SECTIONS.filter((section) => on(section.key)).map((section) => (
+        {HEADING_SECTIONS.filter((section) => on(section.key) && (section.key !== 'card' || templateId === 'custom1')).map((section) => (
           <fieldset className="content-list" key={section.key}>
             <legend>{section.label}</legend>
             <div className="content-row__grid">
