@@ -176,7 +176,7 @@ const HEADING_SECTIONS = [
       { key: 'honour', label: 'Line above the guest\'s name', placeholder: 'Request the honour of the presence of' },
       { key: 'celebrate', label: 'Line above the couple\'s names', placeholder: 'To celebrate the wedding ceremony of their children' },
     ],
-    hint: 'Only the Custom 1 template prints these. Put "&" in the monogram to split it like the initials.' },
+    hint: 'Only the Custom 1 template prints these. Up to four letters print as a large monogram (put "&" between them, e.g. S & A); anything longer prints as a smaller line.' },
   { key: 'rsvp', label: 'RSVP', eyebrow: 'Répondez s\'il vous plaît', title: 'Will you join us?' },
 ];
 

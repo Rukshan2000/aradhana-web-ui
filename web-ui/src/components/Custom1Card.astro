@@ -7,6 +7,8 @@ import { couple as defaultCouple, details as defaultDetails, headings as default
 const { couple = defaultCouple, details = defaultDetails, eyebrow = 'Together with their families', addressee, card: given } = Astro.props;
 // Blank fields keep the printed wording; a custom monogram splits on "&".
 const card = { ...defaultHeadings.card, ...Object.fromEntries(Object.entries(given || {}).filter(([, v]) => v?.trim())) };
+// More than a few letters is a line of text, not initials: print it small.
+const isText = (card.monogram || '').replace(/[\s&]/g, '').length > 4;
 const mono = card.monogram?.trim() ? card.monogram.split('&').map((s) => s.trim()) : [couple.bride?.[0], couple.groom?.[0]];
 const d = new Date(couple.date);
 const part = (o) => new Intl.DateTimeFormat('en-GB', { timeZone: 'Asia/Colombo', ...o }).format(d);
@@ -16,7 +18,7 @@ const venue = details?.[0];
   <img class="c1-card__floral c1-card__floral--tl" src="/assets/custom1/floral-tl.png" alt="" aria-hidden="true" />
   <img class="c1-card__floral c1-card__floral--br" src="/assets/custom1/floral-br.png" alt="" aria-hidden="true" />
   <div class="c1-card__body">
-    <div class="c1-card__mono" aria-hidden="true">
+    <div class:list={["c1-card__mono", { "c1-card__mono--text": isText }]} aria-hidden="true">
       {mono.map((part, i) => <>{i > 0 && <i>&</i>}<span>{part}</span></>)}
     </div>
     <p class="c1-card__caps">{eyebrow}</p>
@@ -83,6 +85,15 @@ const venue = details?.[0];
   }
   .c1-card__mono i { font-family: "Alex Brush", cursive; font-style: normal; margin: 0 -0.1em; }
   .c1-card__mono span:last-child { transform: translateY(0.35em); }
+  .c1-card__mono--text {
+    display: block;
+    font-size: clamp(1rem, 3.2vw, 1.4rem);
+    line-height: 1.4;
+    letter-spacing: 0.05em;
+  }
+  .c1-card__mono--text::after { content: none; }
+  .c1-card__mono--text span:last-child { transform: none; }
+  .c1-card__mono--text i { margin: 0 0.25em; }
 
   .c1-card__caps {
     margin: 0;
